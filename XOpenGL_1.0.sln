@@ -9,6 +9,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenGL-Win32", "OpenGL-Win3
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenGL-MFC-Dialog", "OpenGL-MFC-Dialog\OpenGL-MFC-Dialog.vcxproj", "{7A1F8B5D-52E0-4B23-A47E-E60B3BE40E37}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenGL-MFC-SDI", "OpenGL-MFC-SDI\OpenGL-MFC-SDI.vcxproj", "{00F55156-53BA-40CC-8B24-A66AB6CF14F9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -41,6 +43,14 @@ Global
 		{7A1F8B5D-52E0-4B23-A47E-E60B3BE40E37}.Release|x64.Build.0 = Release|x64
 		{7A1F8B5D-52E0-4B23-A47E-E60B3BE40E37}.Release|x86.ActiveCfg = Release|Win32
 		{7A1F8B5D-52E0-4B23-A47E-E60B3BE40E37}.Release|x86.Build.0 = Release|Win32
+		{00F55156-53BA-40CC-8B24-A66AB6CF14F9}.Debug|x64.ActiveCfg = Debug|x64
+		{00F55156-53BA-40CC-8B24-A66AB6CF14F9}.Debug|x64.Build.0 = Debug|x64
+		{00F55156-53BA-40CC-8B24-A66AB6CF14F9}.Debug|x86.ActiveCfg = Debug|Win32
+		{00F55156-53BA-40CC-8B24-A66AB6CF14F9}.Debug|x86.Build.0 = Debug|Win32
+		{00F55156-53BA-40CC-8B24-A66AB6CF14F9}.Release|x64.ActiveCfg = Release|x64
+		{00F55156-53BA-40CC-8B24-A66AB6CF14F9}.Release|x64.Build.0 = Release|x64
+		{00F55156-53BA-40CC-8B24-A66AB6CF14F9}.Release|x86.ActiveCfg = Release|Win32
+		{00F55156-53BA-40CC-8B24-A66AB6CF14F9}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
