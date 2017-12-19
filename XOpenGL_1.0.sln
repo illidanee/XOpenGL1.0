@@ -19,6 +19,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenGLES2.0-MFC-Dialog", "O
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenGLES2.0-Win32-FullScreen", "OpenGLES2.0-Win32-FullScreen\OpenGLES2.0-Win32-FullScreen.vcxproj", "{521EA97F-6E14-4EE6-9977-939FF2D536D6}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenGL-Win32-FullScreen", "OpenGL-Win32-FullScreen\OpenGL-Win32-FullScreen.vcxproj", "{D30034BD-0A4B-4CD7-8C6D-FAF0B5DCAC3B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -91,6 +93,14 @@ Global
 		{521EA97F-6E14-4EE6-9977-939FF2D536D6}.Release|x64.Build.0 = Release|x64
 		{521EA97F-6E14-4EE6-9977-939FF2D536D6}.Release|x86.ActiveCfg = Release|Win32
 		{521EA97F-6E14-4EE6-9977-939FF2D536D6}.Release|x86.Build.0 = Release|Win32
+		{D30034BD-0A4B-4CD7-8C6D-FAF0B5DCAC3B}.Debug|x64.ActiveCfg = Debug|x64
+		{D30034BD-0A4B-4CD7-8C6D-FAF0B5DCAC3B}.Debug|x64.Build.0 = Debug|x64
+		{D30034BD-0A4B-4CD7-8C6D-FAF0B5DCAC3B}.Debug|x86.ActiveCfg = Debug|Win32
+		{D30034BD-0A4B-4CD7-8C6D-FAF0B5DCAC3B}.Debug|x86.Build.0 = Debug|Win32
+		{D30034BD-0A4B-4CD7-8C6D-FAF0B5DCAC3B}.Release|x64.ActiveCfg = Release|x64
+		{D30034BD-0A4B-4CD7-8C6D-FAF0B5DCAC3B}.Release|x64.Build.0 = Release|x64
+		{D30034BD-0A4B-4CD7-8C6D-FAF0B5DCAC3B}.Release|x86.ActiveCfg = Release|Win32
+		{D30034BD-0A4B-4CD7-8C6D-FAF0B5DCAC3B}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
