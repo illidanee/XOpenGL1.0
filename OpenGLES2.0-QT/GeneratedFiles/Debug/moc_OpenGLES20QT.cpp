@@ -1,44 +1,46 @@
 /****************************************************************************
-** Meta object code from reading C++ file 'OpenGLQT.h'
+** Meta object code from reading C++ file 'OpenGLES20QT.h'
 **
-** Created by: The Qt Meta Object Compiler version 67 (Qt 5.6.2)
+** Created by: The Qt Meta Object Compiler version 67 (Qt 5.9.1)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
-#include "../../OpenGLQT.h"
+#include "../../OpenGLES20QT.h"
 #include <QtCore/qbytearray.h>
 #include <QtCore/qmetatype.h>
 #if !defined(Q_MOC_OUTPUT_REVISION)
-#error "The header file 'OpenGLQT.h' doesn't include <QObject>."
+#error "The header file 'OpenGLES20QT.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 67
-#error "This file was generated using the moc from 5.6.2. It"
+#error "This file was generated using the moc from 5.9.1. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
 
 QT_BEGIN_MOC_NAMESPACE
-struct qt_meta_stringdata_OpenGLQT_t {
+QT_WARNING_PUSH
+QT_WARNING_DISABLE_DEPRECATED
+struct qt_meta_stringdata_OpenGLES20QT_t {
     QByteArrayData data[3];
-    char stringdata0[17];
+    char stringdata0[21];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
-    qptrdiff(offsetof(qt_meta_stringdata_OpenGLQT_t, stringdata0) + ofs \
+    qptrdiff(offsetof(qt_meta_stringdata_OpenGLES20QT_t, stringdata0) + ofs \
         - idx * sizeof(QByteArrayData)) \
     )
-static const qt_meta_stringdata_OpenGLQT_t qt_meta_stringdata_OpenGLQT = {
+static const qt_meta_stringdata_OpenGLES20QT_t qt_meta_stringdata_OpenGLES20QT = {
     {
-QT_MOC_LITERAL(0, 0, 8), // "OpenGLQT"
-QT_MOC_LITERAL(1, 9, 6), // "Render"
-QT_MOC_LITERAL(2, 16, 0) // ""
+QT_MOC_LITERAL(0, 0, 12), // "OpenGLES20QT"
+QT_MOC_LITERAL(1, 13, 6), // "Render"
+QT_MOC_LITERAL(2, 20, 0) // ""
 
     },
-    "OpenGLQT\0Render\0"
+    "OpenGLES20QT\0Render\0"
 };
 #undef QT_MOC_LITERAL
 
-static const uint qt_meta_data_OpenGLQT[] = {
+static const uint qt_meta_data_OpenGLES20QT[] = {
 
  // content:
        7,       // revision
@@ -60,10 +62,10 @@ static const uint qt_meta_data_OpenGLQT[] = {
        0        // eod
 };
 
-void OpenGLQT::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
+void OpenGLES20QT::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
-        OpenGLQT *_t = static_cast<OpenGLQT *>(_o);
+        OpenGLES20QT *_t = static_cast<OpenGLES20QT *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->Render(); break;
@@ -73,26 +75,26 @@ void OpenGLQT::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, vo
     Q_UNUSED(_a);
 }
 
-const QMetaObject OpenGLQT::staticMetaObject = {
-    { &QMainWindow::staticMetaObject, qt_meta_stringdata_OpenGLQT.data,
-      qt_meta_data_OpenGLQT,  qt_static_metacall, Q_NULLPTR, Q_NULLPTR}
+const QMetaObject OpenGLES20QT::staticMetaObject = {
+    { &QMainWindow::staticMetaObject, qt_meta_stringdata_OpenGLES20QT.data,
+      qt_meta_data_OpenGLES20QT,  qt_static_metacall, nullptr, nullptr}
 };
 
 
-const QMetaObject *OpenGLQT::metaObject() const
+const QMetaObject *OpenGLES20QT::metaObject() const
 {
     return QObject::d_ptr->metaObject ? QObject::d_ptr->dynamicMetaObject() : &staticMetaObject;
 }
 
-void *OpenGLQT::qt_metacast(const char *_clname)
+void *OpenGLES20QT::qt_metacast(const char *_clname)
 {
-    if (!_clname) return Q_NULLPTR;
-    if (!strcmp(_clname, qt_meta_stringdata_OpenGLQT.stringdata0))
-        return static_cast<void*>(const_cast< OpenGLQT*>(this));
+    if (!_clname) return nullptr;
+    if (!strcmp(_clname, qt_meta_stringdata_OpenGLES20QT.stringdata0))
+        return static_cast<void*>(const_cast< OpenGLES20QT*>(this));
     return QMainWindow::qt_metacast(_clname);
 }
 
-int OpenGLQT::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
+int OpenGLES20QT::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 {
     _id = QMainWindow::qt_metacall(_c, _id, _a);
     if (_id < 0)
@@ -108,4 +110,5 @@ int OpenGLQT::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     }
     return _id;
 }
+QT_WARNING_POP
 QT_END_MOC_NAMESPACE

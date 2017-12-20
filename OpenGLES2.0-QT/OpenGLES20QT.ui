@@ -1,0 +1,29 @@
+<UI version="4.0" >
+ <class>OpenGLES20QTClass</class>
+ <widget class="QMainWindow" name="OpenGLES20QTClass" >
+  <property name="objectName" >
+   <string notr="true">OpenGLES20QTClass</string>
+  </property>
+  <property name="geometry" >
+   <rect>
+	<x>0</x>
+	<y>0</y>
+	<width>600</width>
+	<height>400</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>OpenGLES20QT</string>
+  </property>
+  <widget class="QMenuBar" name="menuBar" />
+  <widget class="QToolBar" name="mainToolBar" />
+  <widget class="QWidget" name="centralWidget" />
+  <widget class="QStatusBar" name="statusBar" />
+ </widget>
+ <layoutDefault spacing="6" margin="11" />
+ <pixmapfunction></pixmapfunction>
+ <resources>
+   <include location="OpenGLES20QT.qrc"/>
+ </resources>
+ <connections/>
+</UI>

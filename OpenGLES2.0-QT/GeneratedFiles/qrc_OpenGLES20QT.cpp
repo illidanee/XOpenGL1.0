@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Resource object code
 **
-** Created by: The Resource Compiler for Qt version 5.6.2
+** Created by: The Resource Compiler for Qt version 5.9.1
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
@@ -26,21 +26,21 @@ namespace QT_NAMESPACE {
 }
 #endif
 
-int QT_RCC_MANGLE_NAMESPACE(qInitResources_OpenGLQT)();
-int QT_RCC_MANGLE_NAMESPACE(qInitResources_OpenGLQT)()
+int QT_RCC_MANGLE_NAMESPACE(qInitResources_OpenGLES20QT)();
+int QT_RCC_MANGLE_NAMESPACE(qInitResources_OpenGLES20QT)()
 {
     return 1;
 }
 
-int QT_RCC_MANGLE_NAMESPACE(qCleanupResources_OpenGLQT)();
-int QT_RCC_MANGLE_NAMESPACE(qCleanupResources_OpenGLQT)()
+int QT_RCC_MANGLE_NAMESPACE(qCleanupResources_OpenGLES20QT)();
+int QT_RCC_MANGLE_NAMESPACE(qCleanupResources_OpenGLES20QT)()
 {
     return 1;
 }
 
 namespace {
    struct initializer {
-       initializer() { QT_RCC_MANGLE_NAMESPACE(qInitResources_OpenGLQT)(); }
-       ~initializer() { QT_RCC_MANGLE_NAMESPACE(qCleanupResources_OpenGLQT)(); }
+       initializer() { QT_RCC_MANGLE_NAMESPACE(qInitResources_OpenGLES20QT)(); }
+       ~initializer() { QT_RCC_MANGLE_NAMESPACE(qCleanupResources_OpenGLES20QT)(); }
    } dummy;
 }

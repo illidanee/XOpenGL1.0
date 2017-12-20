@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'OpenGLQT.ui'
 **
-** Created by: Qt User Interface Compiler version 5.6.3
+** Created by: Qt User Interface Compiler version 5.6.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -55,7 +55,7 @@ public:
 
     void retranslateUi(QMainWindow *OpenGLQTClass)
     {
-        OpenGLQTClass->setWindowTitle(QApplication::translate("OpenGLQTClass", "OpenGLQT", Q_NULLPTR));
+        OpenGLQTClass->setWindowTitle(QApplication::translate("OpenGLQTClass", "OpenGLQT", 0));
     } // retranslateUi
 
 };
