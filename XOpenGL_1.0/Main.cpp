@@ -5,14 +5,59 @@
 
 using namespace Smile;
 
-class IGLWindow : public XGLWindow
+class LogWindow : public XGLWindow
 {
-	virtual void Render()
+	void Event(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
-		_content.MakeCurrent();
-		glClearColor(1.0f, 0.0f, 1.0f, 1.0f);
+		switch (uMsg)
+		{
+		case WM_DESTROY:
+		{
+			this->_die = true;
+		}
+			break;
+		}
+	}
+	void Begin()
+	{
+
+	}
+	void Render()
+	{
+		glClearColor(0.2f, 0.3f, 0.5f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
-		_content.SwapBuffer();
+	}
+	void End()
+	{
+
+	}
+};
+
+class MainWindow : public XGLWindow
+{
+	void Event(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+	{
+		switch (uMsg)
+		{
+		case WM_DESTROY:
+		{
+			this->_die = true;
+		}
+		break;
+		}
+	}
+	void Begin()
+	{
+
+	}
+	void Render()
+	{
+		glClearColor(0.0f, 0.0f, 0.5f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
+	}
+	void End()
+	{
+
 	}
 };
 
@@ -23,13 +68,10 @@ int __stdcall WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 	XGLWindow::RegisterWndClass(_T("illidan"));
 
 	//创建窗口
-	XGLWindow* pWindow1 = XGLWindow::Create<IGLWindow>(_T("illidan"), _T("illidan1"), 800, 600);
-	XGLWindow* pWindow2 = XGLWindow::Create<IGLWindow>(_T("illidan"), _T("illidan2"), 800, 600);
+	XGLWindow* pWindow1 = XGLWindow::Create<LogWindow>(_T("illidan"), _T("LogWindow"), 100, 200, 300, 600);
+	XGLWindow* pWindow2 = XGLWindow::Create<MainWindow>(_T("illidan"), _T("MainWindow"), 450, 200, 800, 600);
 
 	XGLWindow::Update();
-
-	delete pWindow1;
-	delete pWindow2;
 
 	//销毁窗口信息
 	XGLWindow::ClearWndClass();

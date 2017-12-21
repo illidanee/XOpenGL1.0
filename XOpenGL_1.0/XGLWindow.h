@@ -32,22 +32,17 @@ namespace Smile
 		static void ClearWndClass();
 		
 		template<typename T>
-		static T* Create(LPCTSTR wcName, LPCTSTR wName, int w, int h)
+		static T* Create(LPCTSTR wcName, LPCTSTR wName, int x, int y, int w, int h)
 		{
 			T* pWindow = new T;
-			pWindow->Construct(wcName, wName, w, h);
+			pWindow->Construct(wcName, wName, x, y, w, h);
 			pWindow->Register();
 			return pWindow;
 		}
 		static void Update();
 
 	protected:
-		static LRESULT CALLBACK WindowProc(
-			_In_ HWND   hwnd,
-			_In_ UINT   uMsg,
-			_In_ WPARAM wParam,
-			_In_ LPARAM lParam
-		);
+		static LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	
 /*
@@ -57,17 +52,23 @@ namespace Smile
 		HWND _hWnd;
 		XGLContent _content;
 
-	public:
-		virtual ~XGLWindow();
+		bool _die;
 
 	protected:
 		XGLWindow();
 		XGLWindow(const XGLWindow& that);
 		XGLWindow operator= (const XGLWindow& that);
+		~XGLWindow();
 
-		void Construct(LPCTSTR wcName, LPCTSTR wName, int w, int h);
+		void Construct(LPCTSTR wcName, LPCTSTR wName, int x, int y, int w, int h);
 		void Register();
 
+		void BeginInner();
+		void RenderInner();
+		void EndInner();
+
+	protected:
+		virtual void Event(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 		virtual void Begin();
 		virtual void Render();
 		virtual void End();
