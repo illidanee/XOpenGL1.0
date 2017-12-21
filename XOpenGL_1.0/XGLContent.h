@@ -12,6 +12,7 @@ namespace Smile
 		XGLContent();
 
 		void Begin(HWND hWnd);
+		void MakeCurrent();
 		void SwapBuffer();
 		void End();
 

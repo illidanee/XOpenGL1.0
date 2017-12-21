@@ -32,6 +32,11 @@ namespace Smile
 		wglMakeCurrent(_hDC, _hGLRC);
 	}
 
+	void XGLContent::MakeCurrent()
+	{
+		wglMakeCurrent(_hDC, _hGLRC);
+	}
+
 	void XGLContent::SwapBuffer()
 	{
 		SwapBuffers(_hDC);

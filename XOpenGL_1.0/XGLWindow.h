@@ -12,46 +12,34 @@ namespace Smile
 	class XGLWindow
 	{
 
+
 /*
 	静态区
 */
 	protected:
 		static std::map<LPCTSTR, WNDCLASSEX*> _WCCache;
+		static std::map<HWND, XGLWindow*> _WindowCache;
 
 		static HINSTANCE _hInstance;
 
+		static CRITICAL_SECTION _CS;
+
 	public:
 		static void RegisterInstance(HINSTANCE hInstance);
-		static void RegisterWndClass(LPCTSTR wcName);
+		static void ClearInstance();
 
+		static void RegisterWndClass(LPCTSTR wcName);
+		static void ClearWndClass();
+		
 		template<typename T>
-		static T* CreateXGLWindow(LPCTSTR wcName, LPCTSTR wName, int w, int h)
+		static T* Create(LPCTSTR wcName, LPCTSTR wName, int w, int h)
 		{
 			T* pWindow = new T;
-			pWindow->Create(wcName, wName, w, h);
+			pWindow->Construct(wcName, wName, w, h);
 			pWindow->Register();
 			return pWindow;
 		}
-/*
-	成员区
-*/
-	protected:
-		std::map<HWND, XGLWindow*> _WindowCache;
-
-		HWND _hWnd;
-		XGLContent _content;
-
-	public:
-		XGLWindow();
-		virtual ~XGLWindow();
-
-		void Create(LPCTSTR wcName, LPCTSTR wName, int w, int h);
-		void Register();
-		void Update();
-		void Destroy();
-
-	protected:
-		virtual void Render();
+		static void Update();
 
 	protected:
 		static LRESULT CALLBACK WindowProc(
@@ -60,5 +48,28 @@ namespace Smile
 			_In_ WPARAM wParam,
 			_In_ LPARAM lParam
 		);
+
+	
+/*
+	成员区
+*/
+	protected:
+		HWND _hWnd;
+		XGLContent _content;
+
+	public:
+		virtual ~XGLWindow();
+
+	protected:
+		XGLWindow();
+		XGLWindow(const XGLWindow& that);
+		XGLWindow operator= (const XGLWindow& that);
+
+		void Construct(LPCTSTR wcName, LPCTSTR wName, int w, int h);
+		void Register();
+
+		virtual void Begin();
+		virtual void Render();
+		virtual void End();
 	};
 }
