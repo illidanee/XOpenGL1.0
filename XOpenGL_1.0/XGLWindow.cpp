@@ -147,7 +147,15 @@ namespace Smile
 		{
 			XGLWindow* pThis = (XGLWindow*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 			if (pThis)
+			{
+				//调用自身事件处理。
 				pThis->Event(hWnd, uMsg, wParam, lParam);
+
+				if (uMsg == WM_DESTROY)
+				{
+					pThis->_die = true;
+				}
+			}
 		}
 		return DefWindowProc(hWnd, uMsg, wParam, lParam);
 	}
@@ -197,6 +205,9 @@ namespace Smile
 		else
 			_hWnd = CreateWindowEx(0, wcName, wName, WS_OVERLAPPEDWINDOW, x, y, rect.right - rect.left, rect.bottom - rect.top, 0, 0, 0, this);
 
+		_w = w;
+		_h = h;
+
 		_die = false;
 	}
 
@@ -211,6 +222,8 @@ namespace Smile
 	void XGLWindow::BeginInner()
 	{
 		_content.Begin(_hWnd);
+
+		Begin();
 	}
 
 	void XGLWindow::RenderInner()
@@ -222,17 +235,13 @@ namespace Smile
 
 	void XGLWindow::EndInner()
 	{
+		End();
 		_content.End();
 	}
 
 	void XGLWindow::Event(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
-		switch (uMsg)
-		{
-		case WM_DESTROY:
-			PostQuitMessage(0);
-			break;
-		}
+
 	}
 
 	void XGLWindow::Begin()

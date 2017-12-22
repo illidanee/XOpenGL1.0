@@ -50,9 +50,11 @@ namespace Smile
 */
 	protected:
 		HWND _hWnd;
-		XGLContent _content;
-
+		int _w;
+		int _h;
 		bool _die;
+
+		XGLContent _content;
 
 	protected:
 		XGLWindow();
