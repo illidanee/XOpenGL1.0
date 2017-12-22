@@ -11,6 +11,7 @@ namespace Smile
 
 	void XGLContent::Begin(HWND hWnd)
 	{
+		//初始化OpenGL环境
 		_hWnd = hWnd;
 		_hDC = GetDC(_hWnd);
 
@@ -29,11 +30,17 @@ namespace Smile
 		SetPixelFormat(_hDC, iPixelFormat, &pfd);
 
 		_hGLRC = wglCreateContext(_hDC);
-		wglMakeCurrent(_hDC, _hGLRC);
+
+		//初始化OpenGL扩展环境
+		glewInit();
+
+		//设置当前
+		MakeCurrent();
 	}
 
 	void XGLContent::MakeCurrent()
 	{
+		//设置当前
 		wglMakeCurrent(_hDC, _hGLRC);
 	}
 
