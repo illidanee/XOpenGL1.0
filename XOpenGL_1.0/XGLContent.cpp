@@ -31,11 +31,14 @@ namespace Smile
 
 		_hGLRC = wglCreateContext(_hDC);
 
-		//初始化OpenGL扩展环境
-		glewInit();
-
 		//设置当前
 		MakeCurrent();
+
+		//初始化OpenGL扩展环境  -- 注：必须在MakeCurrent()后才能初始化成功。
+		GLenum err = glewInit();
+
+		//设置垂直同步 -- 注：需要头文件<gl/wglew.h>
+		wglSwapIntervalEXT(1);
 	}
 
 	void XGLContent::MakeCurrent()

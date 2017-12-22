@@ -113,7 +113,7 @@ namespace Smile
 				if (_WindowCache.size() == 0)
 					PostQuitMessage(0);
 
-				Sleep(16);
+				Sleep(1);
 			}
 		}
 		
