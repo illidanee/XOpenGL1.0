@@ -13,10 +13,15 @@ namespace Smile
 	public:
 		XGLContent();
 
-		void Begin(HWND hWnd);
+		void Construct(HWND hWnd);
+		void ConstructMSAA(HWND hWnd);
+		void Begin();
 		void MakeCurrent();
 		void SwapBuffer();
 		void End();
+
+	private:
+		int GetMultiSamplePixelFormat();
 
 	private:
 		HWND _hWnd;

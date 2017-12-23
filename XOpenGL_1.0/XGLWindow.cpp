@@ -113,7 +113,7 @@ namespace Smile
 				if (_WindowCache.size() == 0)
 					PostQuitMessage(0);
 
-				Sleep(1);
+				Sleep(16);
 			}
 		}
 		
@@ -151,7 +151,7 @@ namespace Smile
 				//调用自身事件处理。
 				pThis->Event(hWnd, uMsg, wParam, lParam);
 
-				if (uMsg == WM_DESTROY)
+				if (uMsg == WM_DESTROY && pThis->_die == false)
 				{
 					pThis->_die = true;
 				}
@@ -186,6 +186,9 @@ namespace Smile
 
 	void XGLWindow::Construct(LPCTSTR wcName, LPCTSTR wName, int x, int y, int w, int h)
 	{
+		_w = w;
+		_h = h;
+
 		//计算窗口大小和位置
 		int screenW = GetSystemMetrics(SM_CXSCREEN);
 		int screenH = GetSystemMetrics(SM_CYSCREEN);
@@ -200,15 +203,30 @@ namespace Smile
 
 		AdjustWindowRectEx(&rect, WS_OVERLAPPEDWINDOW, FALSE, 0);
 
-		if ( x == 0 && y == 0)
+		/** 创建OpenGL环境 **/
+		if (x == 0 && y == 0)
 			_hWnd = CreateWindowEx(0, wcName, wName, WS_OVERLAPPEDWINDOW, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, 0, 0, 0, this);
 		else
 			_hWnd = CreateWindowEx(0, wcName, wName, WS_OVERLAPPEDWINDOW, x, y, rect.right - rect.left, rect.bottom - rect.top, 0, 0, 0, this);
 
-		_w = w;
-		_h = h;
+		_die = false;
+	
+		_content.Construct(_hWnd);
+
+
+		/** 创建OpenGL MSAA环境 **/
+		_die = true;
+
+		DestroyWindow(_hWnd);
+
+		if (x == 0 && y == 0)
+			_hWnd = CreateWindowEx(0, wcName, wName, WS_OVERLAPPEDWINDOW, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, 0, 0, 0, this);
+		else
+			_hWnd = CreateWindowEx(0, wcName, wName, WS_OVERLAPPEDWINDOW, x, y, rect.right - rect.left, rect.bottom - rect.top, 0, 0, 0, this);
 
 		_die = false;
+
+		_content.ConstructMSAA(_hWnd);
 	}
 
 	void XGLWindow::Register()
@@ -221,8 +239,7 @@ namespace Smile
 
 	void XGLWindow::BeginInner()
 	{
-		_content.Begin(_hWnd);
-
+		_content.Begin();
 		Begin();
 	}
 

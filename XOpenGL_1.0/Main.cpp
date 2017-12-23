@@ -65,10 +65,16 @@ class MainWindow : public XGLWindow
 		glLoadIdentity();
 		glOrtho(0, _w, 0, _h, -100, 100);
 
+		glPointSize(10);
 		glColor3f(1, 1, 1);
 		glEnableClientState(GL_VERTEX_ARRAY);
 		glVertexPointer(3, GL_FLOAT, sizeof(float3), _vertices);
-		glDrawArrays(GL_TRIANGLE_FAN, 0, 362);
+		glDrawArrays(GL_POINTS, 0, 362);
+
+		
+		//glBegin(GL_POINT);
+		//glVertex2f(400, 300);
+		//glEnd();
 	}
 	void End()
 	{
