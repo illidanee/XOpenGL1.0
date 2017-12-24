@@ -15,16 +15,17 @@ namespace Smile
 		{ +1, +1, 1, 1, 1 },
 	};
 
+	char* pBuffer;
+	int w;
+	int h;
+
 	void Smile::XRenderWindow::Begin()
 	{
-		char* pBuffer;
-		int w;
-		int h;
 		int res = XResource::LoadTextureFile("../Resources/1.jpg", &pBuffer, &w, &h);
 		if (res)
 		{
 			glEnable(GL_TEXTURE_2D);
-			glGenBuffers(1, &_texture);
+			glGenTextures(1, &_texture);
 			glBindTexture(GL_TEXTURE_2D, _texture);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -58,7 +59,9 @@ namespace Smile
 
 	void Smile::XRenderWindow::End()
 	{
-
+		// Õ∑≈ª·±®¥Ì°£
+		//delete[] pBuffer;
+		glDeleteTextures(1, &_texture);
 	}
 }
 

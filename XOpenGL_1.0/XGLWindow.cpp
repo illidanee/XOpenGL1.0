@@ -97,6 +97,12 @@ namespace Smile
 				{
 					if (it->second->_die)
 					{
+						EnterCriticalSection(&_CS);
+
+						it->second->EndInner();
+
+						LeaveCriticalSection(&_CS);
+
 						//DestroyWindow()函数发出 WM_DESTROY 消息，当收到此消息也就说明调用了DestroyWindow()函数。
 						//DestroyWindow(it->first);
 						//如果此处不delete,则需要调用者删除。这样就需要把析构函数公开。
@@ -117,14 +123,16 @@ namespace Smile
 			}
 		}
 		
-		for (std::map<HWND, XGLWindow*>::iterator it = _WindowCache.begin(); it != _WindowCache.end(); ++it)
-		{
-			EnterCriticalSection(&_CS);
+		//Bug
+		//推出循环时_WindowCache为空了。此处永远执行不到。
+		//for (std::map<HWND, XGLWindow*>::iterator it = _WindowCache.begin(); it != _WindowCache.end(); ++it)
+		//{
+		//	EnterCriticalSection(&_CS);
 
-			it->second->EndInner();
+		//	it->second->EndInner();
 
-			LeaveCriticalSection(&_CS);
-		}
+		//	LeaveCriticalSection(&_CS);
+		//}
 
 		DeleteCriticalSection(&_CS);
 	}
