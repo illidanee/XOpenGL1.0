@@ -1,15 +1,19 @@
 #include <tchar.h>
 #include <windows.h>
 
+
+#include "XResource.h"
 #include "XGLWindow.h"
+
 
 using namespace Smile;
 
 #define M_PI 3.14159265358979323846
 
-struct float3
+struct Vertex
 {
 	float x, y, z;
+	float u, v;
 };
 
 class LogWindow : public XGLWindow
@@ -29,31 +33,32 @@ class LogWindow : public XGLWindow
 	}
 };
 
+Vertex vertices[] = {
+	{ -1, -1, 1, 0, 0 },
+	{ +1, -1, 1, 1, 0 },
+	{ -1, +1, 1, 0, 1 },
+	{ +1, +1, 1, 1, 1 },
+};
+
 class MainWindow : public XGLWindow
 {
-	float _cx;
-	float _cy;
-	float _cz;
-	float _R;
-	float3* _vertices;
+	GLuint _texture;
 
 	void Begin()
 	{
-		_cx = 400;
-		_cy = 300;
-		_cz = 0;
-		_R = 200;
-		_vertices = new float3[362];
-
-		_vertices[0].x = _cx;
-		_vertices[0].y = _cy;
-		_vertices[0].z = _cz;
-
-		for (int i = 0; i <= 360; ++i)
+		char* pBuffer;
+		int w;
+		int h;
+		int res = XResource::LoadTextureFile("../Resources/1.jpg", &pBuffer, &w, &h);
+		if (res)
 		{
-			_vertices[i + 1].x = _cx + (float)cos(i * M_PI / 180.0f) * _R;
-			_vertices[i + 1].y = _cy + (float)sin(i * M_PI / 180.0f) * _R;
-			_vertices[i + 1].z = _cz;
+			glEnable(GL_TEXTURE_2D);
+			glGenBuffers(1, &_texture);
+			glBindTexture(GL_TEXTURE_2D, _texture);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, pBuffer);
+			glBindTexture(GL_TEXTURE_2D, 0);
 		}
 	}
 	void Render()
@@ -63,18 +68,21 @@ class MainWindow : public XGLWindow
 
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
-		glOrtho(0, _w, 0, _h, -100, 100);
+		//glOrtho(0, _w, 0, _h, -100, 100);
+		gluPerspective(60.0f, (float)_w / _h, 0.01f, 1000.0f);
 
-		glPointSize(10);
-		glColor3f(1, 1, 1);
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
+		glTranslatef(0.0f, 0.0f, -3.0f);
+
 		glEnableClientState(GL_VERTEX_ARRAY);
-		glVertexPointer(3, GL_FLOAT, sizeof(float3), _vertices);
-		glDrawArrays(GL_POINTS, 0, 362);
+		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+		glVertexPointer(3, GL_FLOAT, sizeof(Vertex), &vertices[0].x);
+		glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), &vertices[0].u);
 
-		
-		//glBegin(GL_POINT);
-		//glVertex2f(400, 300);
-		//glEnd();
+		glBindTexture(GL_TEXTURE_2D, _texture);
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
 	}
 	void End()
 	{
