@@ -158,11 +158,15 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="XGLContent.cpp" />
     <ClCompile Include="XGLWindow.cpp" />
+    <ClCompile Include="XLog.cpp" />
+    <ClCompile Include="XRenderWindow.cpp" />
     <ClCompile Include="XResource.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="XGLContent.h" />
     <ClInclude Include="XGLWindow.h" />
+    <ClInclude Include="XLog.h" />
+    <ClInclude Include="XRenderWindow.h" />
     <ClInclude Include="XResource.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

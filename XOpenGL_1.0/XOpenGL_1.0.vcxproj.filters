@@ -30,6 +30,12 @@
     <ClCompile Include="XResource.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="XLog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="XRenderWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="XGLContent.h">
@@ -39,6 +45,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="XResource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="XLog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="XRenderWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
