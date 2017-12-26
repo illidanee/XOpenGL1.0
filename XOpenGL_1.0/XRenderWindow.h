@@ -7,8 +7,6 @@ namespace Smile
 {
 	class XRenderWindow : public XGLWindow
 	{
-		GLuint _texture;
-
 		void Begin();
 		void Render();
 		void End();
