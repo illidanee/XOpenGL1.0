@@ -22,14 +22,15 @@ namespace Smile
 	int h;
 
 	GLuint _texture1;
-	GLuint _texture2;
+
+	GLUquadricObj *quadratic;
 
 	void Smile::XRenderWindow::Begin()
 	{
 		int res = 0;
 
 		//读取纹理数据
-		res = XResource::LoadTextureFile("../Resources/Cove.bmp", &pBuffer, &w, &h);
+		res = XResource::LoadTextureFile("../Resources/BG.bmp", &pBuffer, &w, &h);
 		if (res)
 		{
 			glEnable(GL_TEXTURE_2D);
@@ -41,18 +42,16 @@ namespace Smile
 			glBindTexture(GL_TEXTURE_2D, 0);
 		}
 
-		//读取纹理数据
-		res = XResource::LoadTextureFile("../Resources/fog.bmp", &pBuffer, &w, &h);
-		if (res)
-		{
-			glEnable(GL_TEXTURE_2D);
-			glGenTextures(1, &_texture2);
-			glBindTexture(GL_TEXTURE_2D, _texture2);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, pBuffer);
-			glBindTexture(GL_TEXTURE_2D, 0);
-		}
+		quadratic = gluNewQuadric();
+		gluQuadricDrawStyle(quadratic, GLU_FILL);
+		gluQuadricOrientation(quadratic, GLU_OUTSIDE);
+		gluQuadricNormals(quadratic, GLU_SMOOTH);
+		gluQuadricTexture(quadratic, GL_TRUE);
+
+		glEnable(GL_TEXTURE_GEN_S);
+		glEnable(GL_TEXTURE_GEN_T);
+		glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP);
+		glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP);
 	}
 
 	void Smile::XRenderWindow::Render()
@@ -72,33 +71,11 @@ namespace Smile
 		glLoadIdentity();
 		glTranslatef(0.0f, 0.0f, -3.0f);
 
-		//激活纹理单元 & 设置纹理矩阵
-		glActiveTextureARB(GL_TEXTURE0_ARB);
+		//绑定纹理
 		glEnable(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D, _texture1);
-		//glMatrixMode(GL_TEXTURE);
-		//glTranslatef(0.0f, 0.001f, 0.0f);
 
-		glActiveTextureARB(GL_TEXTURE1_ARB);
-		glEnable(GL_TEXTURE_2D);
-		glBindTexture(GL_TEXTURE_2D, _texture2);
-		glMatrixMode(GL_TEXTURE);
-		glTranslatef(0.002f, 0.0f, 0.0f);
-
-		//绑定顶点数据
-		glEnableClientState(GL_VERTEX_ARRAY);
-		glVertexPointer(3, GL_FLOAT, sizeof(Vertex), &vertices[0].x);
-
-		glClientActiveTextureARB(GL_TEXTURE0_ARB);
-		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-		glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), &vertices[0].u1);
-
-		glClientActiveTextureARB(GL_TEXTURE1_ARB);
-		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-		glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), &vertices[0].u2);
-
-		//绘制
-		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		gluSphere(quadratic, 1.3f, 32, 32);
 	}
 
 	void Smile::XRenderWindow::End()
@@ -106,7 +83,6 @@ namespace Smile
 		//释放会报错。
 		//delete[] pBuffer;
 		glDeleteTextures(1, &_texture1);
-		glDeleteTextures(1, &_texture2);
 	}
 }
 
