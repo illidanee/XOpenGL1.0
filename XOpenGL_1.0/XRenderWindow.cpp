@@ -1,11 +1,9 @@
 #include "XRenderWindow.h"
 
+#include "XVideo.h"
+
 namespace Smile
 {
-	int _col = 9;
-	int _imageW = 108;
-	int _imageH = 108;
-
 	//全局数据
 	struct Vertex
 	{
@@ -13,28 +11,25 @@ namespace Smile
 		float u, v;
 	};
 
-	char* pBuffer;
-	int w;
-	int h;
+	XVideo _Video;
 
 	GLuint _texture1;
 
+	
+
 	void Smile::XRenderWindow::Begin()
 	{
-		int res = 0;
+		XVideo::Init();
+		_Video.LoadVideoFile("../Resources/1.avi");
 
 		//读取纹理数据
-		res = XResource::LoadTextureFile("../Resources/xx.png", &pBuffer, &w, &h);
-		if (res)
-		{
-			glEnable(GL_TEXTURE_2D);
-			glGenTextures(1, &_texture1);
-			glBindTexture(GL_TEXTURE_2D, _texture1);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, pBuffer);
-			glBindTexture(GL_TEXTURE_2D, 0);
-		}
+		glEnable(GL_TEXTURE_2D);
+		glGenTextures(1, &_texture1);
+		glBindTexture(GL_TEXTURE_2D, _texture1);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _Video.GetW(), _Video.GetH(), 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
 	void Smile::XRenderWindow::Render()
@@ -61,32 +56,20 @@ namespace Smile
 		//设置模型矩阵
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
-		glTranslatef(0.0f, 0.0f, -3.0f);
+		glTranslatef(0.0f, 0.0f, -2.0f);
 
 		//绑定纹理
 		glEnable(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D, _texture1);
 
-		//绑定顶点
-		int frame = (int)tm;
-
-		int     col = frame % _col;
-		int     row = frame / _col;
-
-		float u = (float)(_imageW * col) / w;
-		float v = (float)(_imageW * row) / h;
-
-		++col;
-		++row;
-
-		float u1 = (float)(_imageW * col) / w;
-		float v1 = (float)(_imageW * row) / h;
+		void*   data = _Video.ReadFrame();
+		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, _Video.GetW(), _Video.GetH(), GL_RGB, GL_UNSIGNED_BYTE, data);
 
 		Vertex vertices[] = {
-			{ -1, -1, 0,  u, v },
-			{ +1, -1, 0,  u1, v },
-			{ -1, +1, 0,  u, v1 },
-			{ +1, +1, 0,  u1, v1 },
+			{ -1, -1, 0,  0, 1 },
+			{ +1, -1, 0,  1, 1 },
+			{ -1, +1, 0,  0, 0 },
+			{ +1, +1, 0,  1, 0 },
 		};
 
 		glEnableClientState(GL_VERTEX_ARRAY);
@@ -100,7 +83,6 @@ namespace Smile
 
 	void Smile::XRenderWindow::End()
 	{
-		delete[] pBuffer;
 		glDeleteTextures(1, &_texture1);
 	}
 }
