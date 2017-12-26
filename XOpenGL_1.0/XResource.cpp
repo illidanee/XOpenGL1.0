@@ -16,9 +16,15 @@ namespace Smile
 		dib = FreeImage_ConvertTo32Bits(dib);
 		FreeImage_Unload(temp);
 
-		*pBuffer = (char*)FreeImage_GetBits(dib);
+		char* tempBuffer = (char*)FreeImage_GetBits(dib);
 		*w = FreeImage_GetWidth(dib);
 		*h = FreeImage_GetHeight(dib);
+
+		//tempBuffer指向的内存在调用FreeImage_Unload()后会释放，所以这里分配内存空间，需要外部释放。但这种方法并不高效和安全。最好需要在这里直接创建纹理。
+		size_t size = *w * *h * 4;
+		*pBuffer = new char[size];
+		memcpy(*pBuffer, tempBuffer, size);
+
 		FreeImage_Unload(dib);
 
 		return 1;

@@ -2,19 +2,15 @@
 
 namespace Smile
 {
+	int _col = 9;
+	int _imageW = 108;
+	int _imageH = 108;
+
 	//全局数据
 	struct Vertex
 	{
 		float x, y, z;
-		float u1, v1;
-		float u2, v2;
-	};
-
-	Vertex vertices[] = {
-		{ -1, -1, 1,  0, 0,  0, 0 },
-		{ +1, -1, 1,  1, 0,  1, 0 },
-		{ -1, +1, 1,  0, 1,  0, 1 },
-		{ +1, +1, 1,  1, 1,  1, 1 },
+		float u, v;
 	};
 
 	char* pBuffer;
@@ -23,14 +19,12 @@ namespace Smile
 
 	GLuint _texture1;
 
-	GLUquadricObj *quadratic;
-
 	void Smile::XRenderWindow::Begin()
 	{
 		int res = 0;
 
 		//读取纹理数据
-		res = XResource::LoadTextureFile("../Resources/BG.bmp", &pBuffer, &w, &h);
+		res = XResource::LoadTextureFile("../Resources/xx.png", &pBuffer, &w, &h);
 		if (res)
 		{
 			glEnable(GL_TEXTURE_2D);
@@ -38,24 +32,22 @@ namespace Smile
 			glBindTexture(GL_TEXTURE_2D, _texture1);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, pBuffer);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, pBuffer);
 			glBindTexture(GL_TEXTURE_2D, 0);
 		}
-
-		quadratic = gluNewQuadric();
-		gluQuadricDrawStyle(quadratic, GLU_FILL);
-		gluQuadricOrientation(quadratic, GLU_OUTSIDE);
-		gluQuadricNormals(quadratic, GLU_SMOOTH);
-		gluQuadricTexture(quadratic, GL_TRUE);
-
-		glEnable(GL_TEXTURE_GEN_S);
-		glEnable(GL_TEXTURE_GEN_T);
-		glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP);
-		glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP);
 	}
 
 	void Smile::XRenderWindow::Render()
 	{
+		//变量
+		static float tm = 0;
+
+		tm += 0.5;
+		if (tm >= 64)
+		{
+			tm = 0;
+		}
+
 		//清空
 		glClearColor(0.1f, 0.2f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -75,13 +67,40 @@ namespace Smile
 		glEnable(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D, _texture1);
 
-		gluSphere(quadratic, 1.3f, 32, 32);
+		//绑定顶点
+		int frame = (int)tm;
+
+		int     col = frame % _col;
+		int     row = frame / _col;
+
+		float u = (float)(_imageW * col) / w;
+		float v = (float)(_imageW * row) / h;
+
+		++col;
+		++row;
+
+		float u1 = (float)(_imageW * col) / w;
+		float v1 = (float)(_imageW * row) / h;
+
+		Vertex vertices[] = {
+			{ -1, -1, 0,  u, v },
+			{ +1, -1, 0,  u1, v },
+			{ -1, +1, 0,  u, v1 },
+			{ +1, +1, 0,  u1, v1 },
+		};
+
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glVertexPointer(3, GL_FLOAT, sizeof(Vertex), &vertices[0].x);
+
+		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+		glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), &vertices[0].u);
+		
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	}
 
 	void Smile::XRenderWindow::End()
 	{
-		//释放会报错。
-		//delete[] pBuffer;
+		delete[] pBuffer;
 		glDeleteTextures(1, &_texture1);
 	}
 }
