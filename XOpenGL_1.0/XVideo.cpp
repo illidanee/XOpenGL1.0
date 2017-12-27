@@ -49,7 +49,7 @@ namespace Smile
 		}
 
 		_VideoIndex = -1;
-		for (int i = 0; i < _pFC->nb_streams; ++i)
+		for (unsigned int i = 0; i < _pFC->nb_streams; ++i)
 		{
 			_pCC = _pFC->streams[i]->codec;
 			if (_pCC->codec_type == AVMEDIA_TYPE_VIDEO)
@@ -90,6 +90,8 @@ namespace Smile
 			//---
 			return  -5;
 		}
+
+		return 1;
 	}
 
 	int XVideo::FreeVideoFile()

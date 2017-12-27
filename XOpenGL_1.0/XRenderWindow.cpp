@@ -2,25 +2,71 @@
 
 #include "XVideo.h"
 
+#define _PI           3.14159265358979323846f 
+
+
+
 namespace Smile
 {
 	//全局数据
-	struct Vertex
+	struct float3
 	{
-		float x, y, z;
-		float u, v;
+		float3() {}
+		float3(float x, float y, float z) : _x(x), _y(y), _z(z) {}
+		float3 operator * (const float& o)
+		{
+			return float3(_x * o, _y * o, _z * o);
+		}
+		float3 operator + (const float3& o)
+		{
+			return float3(_x + o._x, _y + o._y, _z + o._z);
+		}
+
+		float _x, _y, _z;
 	};
 
-	XVideo _Video;
+	struct Particle
+	{
+		float3 _Pos;
+		float3 _Vel;
+		unsigned char _r;
+		unsigned char _g;
+		unsigned char _b;
+		unsigned char _a;
+	};
+
+	const int PARTICLE_SIZE = 500;
+
+	const float speed = 0.005f;
+
+	Particle particles[PARTICLE_SIZE];
 
 	GLuint _texture1;
 
-	
+	float RandomIdentity()
+	{
+		return ((float)rand() / RAND_MAX) * 2.0f - 1.0f;
+	}
+
+	float3 RandomVector()
+	{
+		float3 vVector;
+		vVector._z = RandomIdentity();
+
+		float r = (float)sqrt(1 - vVector._z * vVector._z);
+		float t = (float)RandomIdentity() * _PI;
+
+		vVector._x = (float)cosf(t) * r;
+		vVector._y = (float)sinf(t) * r;
+
+		return vVector;
+	}
 
 	void Smile::XRenderWindow::Begin()
 	{
-		XVideo::Init();
-		_Video.LoadVideoFile("../Resources/1.avi");
+		char* pBuffer;
+		int w, h;
+		XResource::LoadTextureFile("../Resources/particle.bmp", &pBuffer, &w, &h);
 
 		//读取纹理数据
 		glEnable(GL_TEXTURE_2D);
@@ -28,8 +74,18 @@ namespace Smile
 		glBindTexture(GL_TEXTURE_2D, _texture1);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _Video.GetW(), _Video.GetH(), 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, pBuffer);
 		glBindTexture(GL_TEXTURE_2D, 0);
+
+		for (int i = 0; i < PARTICLE_SIZE; ++i)
+		{
+			particles[i]._Pos = float3(0.0f, 0.0f, 0.0f);
+			particles[i]._Vel = RandomVector() * (rand() % 5 + 0.5f);
+			particles[i]._r = rand() % 255;
+			particles[i]._g = rand() % 255;
+			particles[i]._b = rand() % 255;
+			particles[i]._a = 255;
+		}
 	}
 
 	void Smile::XRenderWindow::Render()
@@ -62,23 +118,56 @@ namespace Smile
 		glEnable(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D, _texture1);
 
-		void*   data = _Video.ReadFrame();
-		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, _Video.GetW(), _Video.GetH(), GL_RGB, GL_UNSIGNED_BYTE, data);
+		//混合
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
-		Vertex vertices[] = {
-			{ -1, -1, 0,  0, 1 },
-			{ +1, -1, 0,  1, 1 },
-			{ -1, +1, 0,  0, 0 },
-			{ +1, +1, 0,  1, 0 },
-		};
+		//点精灵设置
+		//float maxSize = 0.0f;
+		//glGetFloatv(GL_POINT_SIZE_MAX_ARB, &maxSize);
+		//// size of 1024.0f!
+		//if (maxSize > 100.0f)
+		//	maxSize = 100.0f;
+
+		glPointSize(10);
+
+		//glPointParameterfARB(GL_POINT_FADE_THRESHOLD_SIZE_ARB, 60.0f);
+		//glPointParameterfARB(GL_POINT_SIZE_MIN_ARB, 1.0f);
+		//glPointParameterfARB(GL_POINT_SIZE_MAX_ARB, 100);
+
+		glTexEnvf(GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_TRUE);
+		glEnable(GL_POINT_SPRITE_ARB);
+
+
+		//更新和设置数据
+		static DWORD dStartAppTime = GetTickCount();
+		float fElpasedAppTime = ((GetTickCount() - dStartAppTime) * 0.001f);
+
+		static DWORD dLastFrameTime = GetTickCount();
+		DWORD dCurrenFrameTime = GetTickCount();
+		float dElpasedFrameTime = ((dCurrenFrameTime - dLastFrameTime) * speed);
+		dLastFrameTime = dCurrenFrameTime;
+
+		if (fElpasedAppTime >= 10.0f)
+		{
+			for (int i = 0; i < PARTICLE_SIZE; ++i)
+				particles[i]._Pos = float3(0.0f, 0.0f, 0.0f);
+
+			dStartAppTime = GetTickCount();
+		}
+
+		for (int i = 0; i < PARTICLE_SIZE; ++i)
+			particles[i]._Pos = particles[i]._Pos + particles[i]._Vel *(float)dElpasedFrameTime * 0.1f;
 
 		glEnableClientState(GL_VERTEX_ARRAY);
-		glVertexPointer(3, GL_FLOAT, sizeof(Vertex), &vertices[0].x);
+		glVertexPointer(3, GL_FLOAT, sizeof(Particle), &particles[0]._Pos._x);
 
-		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-		glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), &vertices[0].u);
+		glEnableClientState(GL_COLOR_ARRAY);
+		glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(Particle), &particles[0]._r);
 		
-		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		glDrawArrays(GL_POINTS, 0, PARTICLE_SIZE);
+
+		glDisable(GL_POINT_SPRITE_ARB);
 	}
 
 	void Smile::XRenderWindow::End()
