@@ -35,7 +35,7 @@ namespace Smile
 		unsigned char _a;
 	};
 
-	const int PARTICLE_SIZE = 500;
+	const int PARTICLE_SIZE = 200;
 
 	const float speed = 0.005f;
 
@@ -122,22 +122,25 @@ namespace Smile
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
-		//点精灵设置
-		//float maxSize = 0.0f;
-		//glGetFloatv(GL_POINT_SIZE_MAX_ARB, &maxSize);
-		//// size of 1024.0f!
-		//if (maxSize > 100.0f)
-		//	maxSize = 100.0f;
-
-		glPointSize(10);
-
-		//glPointParameterfARB(GL_POINT_FADE_THRESHOLD_SIZE_ARB, 60.0f);
-		//glPointParameterfARB(GL_POINT_SIZE_MIN_ARB, 1.0f);
-		//glPointParameterfARB(GL_POINT_SIZE_MAX_ARB, 100);
-
-		glTexEnvf(GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_TRUE);
+		//启用点精灵
 		glEnable(GL_POINT_SPRITE_ARB);
 
+		//点精灵大小设置
+		float maxSize = 0.0f;
+		glGetFloatv(GL_POINT_SIZE_MAX_ARB, &maxSize);
+		if (maxSize > 100.0f)
+			maxSize = 100.0f;
+		glPointSize(maxSize);
+		glPointParameterfARB(GL_POINT_SIZE_MAX_ARB, maxSize);
+		glPointParameterfARB(GL_POINT_SIZE_MIN_ARB, 1.0f);
+		glPointParameterfARB(GL_POINT_FADE_THRESHOLD_SIZE_ARB, 10.0f);
+
+		//点精灵距离影响大小 derived_size = clamp(size * sqrt(1 / (a + b * d + c * d ^ 2))) ，d为距离。
+		float quadratic[] = { 1.0f, 0.0f, 0.9f };
+		glPointParameterfvARB(GL_POINT_DISTANCE_ATTENUATION_ARB, quadratic);
+
+		//点精灵纹理替换模式
+		glTexEnvf(GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_TRUE);
 
 		//更新和设置数据
 		static DWORD dStartAppTime = GetTickCount();
@@ -167,6 +170,7 @@ namespace Smile
 		
 		glDrawArrays(GL_POINTS, 0, PARTICLE_SIZE);
 
+		//禁用点精灵
 		glDisable(GL_POINT_SPRITE_ARB);
 	}
 
