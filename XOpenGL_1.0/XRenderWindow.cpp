@@ -1,182 +1,147 @@
 #include "XRenderWindow.h"
 
-#include "XVideo.h"
-
-#define _PI           3.14159265358979323846f 
-
-
-
 namespace Smile
 {
-	//全局数据
-	struct float3
+	struct Vertex
 	{
-		float3() {}
-		float3(float x, float y, float z) : _x(x), _y(y), _z(z) {}
-		float3 operator * (const float& o)
-		{
-			return float3(_x * o, _y * o, _z * o);
-		}
-		float3 operator + (const float3& o)
-		{
-			return float3(_x + o._x, _y + o._y, _z + o._z);
-		}
-
 		float _x, _y, _z;
+		float _u, _v;
 	};
 
-	struct Particle
-	{
-		float3 _Pos;
-		float3 _Vel;
-		unsigned char _r;
-		unsigned char _g;
-		unsigned char _b;
-		unsigned char _a;
-	};
-
-	const int PARTICLE_SIZE = 200;
-
-	const float speed = 0.005f;
-
-	Particle particles[PARTICLE_SIZE];
-
+	GLuint _texture0;
 	GLuint _texture1;
+	GLuint _texture2;
 
-	float RandomIdentity()
+	//透视投影绘制3D
+	void Render3D(int w, int h)
 	{
-		return ((float)rand() / RAND_MAX) * 2.0f - 1.0f;
+		//启用深度测试
+		glEnable(GL_DEPTH_TEST);
+
+		//设置投影矩阵
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		gluPerspective(60.0f, (float)w / h, 0.01f, 1000.0f);
+
+		//设置模型矩阵
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
+		glTranslatef(0.0f, 0.0f, -5.0f);
+
+		glDisableClientState(GL_VERTEX_ARRAY);
+		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+
+		glBindTexture(GL_TEXTURE_2D, _texture0);
+
+		glBegin(GL_TRIANGLE_STRIP);
+			glTexCoord2f(0.0f, 16.0f);	glVertex3f(-16, -1, -16);
+			glTexCoord2f(0.0f, 0.0f);	glVertex3f(-10, -1, 16);
+			glTexCoord2f(16.0f, 16.0f);	glVertex3f(16, -1, -16);
+			glTexCoord2f(16.0f, 0.0f);	glVertex3f(16, -1, 16);
+		glEnd();
 	}
 
-	float3 RandomVector()
+	//正交投影绘制2D
+	void Render2D(int w, int h)
 	{
-		float3 vVector;
-		vVector._z = RandomIdentity();
+		//关闭深度测试
+		glDisable(GL_DEPTH_TEST);
 
-		float r = (float)sqrt(1 - vVector._z * vVector._z);
-		float t = (float)RandomIdentity() * _PI;
+		//正交投影绘制平面
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		glOrtho(0, w, 0, h, -100, 100);
 
-		vVector._x = (float)cosf(t) * r;
-		vVector._y = (float)sinf(t) * r;
+		//***
+		//		纹理坐标错误可能会造成画片不正确。常见的现象是混合后画面出现对角斜线，并在对角斜线两侧表现相反的显示结果。
+		//***
+		Vertex  vert[] =
+		{
+			{ 0,			0,			20,		0.0f, 0.0f },
+			{ 0,			(float)h,	20,		0.0f, 1.0f },
+			{ (float)w,		0,			20,		1.0f, 0.0f },
+			{ (float)w,		(float)h,	20,		1.0f, 1.0f },
+		};
 
-		return vVector;
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glVertexPointer(3, GL_FLOAT, sizeof(Vertex), &vert[0]._x);
+		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+		glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), &vert[0]._u);
+
+		glEnable(GL_BLEND);
+
+		glBlendFunc(GL_DST_COLOR, GL_ZERO);
+		glBindTexture(GL_TEXTURE_2D, _texture1);
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+		glBlendFunc(GL_ONE, GL_ONE);
+		glBindTexture(GL_TEXTURE_2D, _texture2);
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+		glDisable(GL_BLEND);
 	}
 
 	void Smile::XRenderWindow::Begin()
 	{
 		char* pBuffer;
 		int w, h;
-		XResource::LoadTextureFile("../Resources/particle.bmp", &pBuffer, &w, &h);
 
-		//读取纹理数据
-		glEnable(GL_TEXTURE_2D);
-		glGenTextures(1, &_texture1);
-		glBindTexture(GL_TEXTURE_2D, _texture1);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, pBuffer);
-		glBindTexture(GL_TEXTURE_2D, 0);
-
-		for (int i = 0; i < PARTICLE_SIZE; ++i)
 		{
-			particles[i]._Pos = float3(0.0f, 0.0f, 0.0f);
-			particles[i]._Vel = RandomVector() * (rand() % 5 + 0.5f);
-			particles[i]._r = rand() % 255;
-			particles[i]._g = rand() % 255;
-			particles[i]._b = rand() % 255;
-			particles[i]._a = 255;
+			XResource::LoadTextureFile("../Resources/floor.bmp", &pBuffer, &w, &h);
+
+			//读取纹理数据
+			glEnable(GL_TEXTURE_2D);
+			glGenTextures(1, &_texture0);
+			glBindTexture(GL_TEXTURE_2D, _texture0);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, pBuffer);
+			glBindTexture(GL_TEXTURE_2D, 0);
 		}
+
+		{
+			XResource::LoadTextureFile("../Resources/CrossHairMask.bmp", &pBuffer, &w, &h);
+
+			//读取纹理数据
+			glEnable(GL_TEXTURE_2D);
+			glGenTextures(1, &_texture1);
+			glBindTexture(GL_TEXTURE_2D, _texture1);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, pBuffer);
+			glBindTexture(GL_TEXTURE_2D, 0);
+		}
+
+		{
+			XResource::LoadTextureFile("../Resources/CrossHair.bmp", &pBuffer, &w, &h);
+
+			//读取纹理数据
+			glEnable(GL_TEXTURE_2D);
+			glGenTextures(1, &_texture2);
+			glBindTexture(GL_TEXTURE_2D, _texture2);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, pBuffer);
+			glBindTexture(GL_TEXTURE_2D, 0);
+		}
+
 	}
 
 	void Smile::XRenderWindow::Render()
 	{
-		//变量
-		static float tm = 0;
-
-		tm += 0.5;
-		if (tm >= 64)
-		{
-			tm = 0;
-		}
-
 		//清空
-		glClearColor(0.1f, 0.2f, 0.3f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		//设置投影矩阵
-		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
-		//glOrtho(0, _w, 0, _h, -100, 100);
-		gluPerspective(60.0f, (float)_w / _h, 0.01f, 1000.0f);
-
-		//设置模型矩阵
-		glMatrixMode(GL_MODELVIEW);
-		glLoadIdentity();
-		glTranslatef(0.0f, 0.0f, -2.0f);
-
-		//绑定纹理
-		glEnable(GL_TEXTURE_2D);
-		glBindTexture(GL_TEXTURE_2D, _texture1);
-
-		//混合
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-
-		//启用点精灵
-		glEnable(GL_POINT_SPRITE_ARB);
-
-		//点精灵大小设置
-		float maxSize = 0.0f;
-		glGetFloatv(GL_POINT_SIZE_MAX_ARB, &maxSize);
-		if (maxSize > 100.0f)
-			maxSize = 100.0f;
-		glPointSize(maxSize);
-		glPointParameterfARB(GL_POINT_SIZE_MAX_ARB, maxSize);
-		glPointParameterfARB(GL_POINT_SIZE_MIN_ARB, 1.0f);
-		glPointParameterfARB(GL_POINT_FADE_THRESHOLD_SIZE_ARB, 10.0f);
-
-		//点精灵距离影响大小 derived_size = clamp(size * sqrt(1 / (a + b * d + c * d ^ 2))) ，d为距离。
-		float quadratic[] = { 1.0f, 0.0f, 0.9f };
-		glPointParameterfvARB(GL_POINT_DISTANCE_ATTENUATION_ARB, quadratic);
-
-		//点精灵纹理替换模式
-		glTexEnvf(GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_TRUE);
-
-		//更新和设置数据
-		static DWORD dStartAppTime = GetTickCount();
-		float fElpasedAppTime = ((GetTickCount() - dStartAppTime) * 0.001f);
-
-		static DWORD dLastFrameTime = GetTickCount();
-		DWORD dCurrenFrameTime = GetTickCount();
-		float dElpasedFrameTime = ((dCurrenFrameTime - dLastFrameTime) * speed);
-		dLastFrameTime = dCurrenFrameTime;
-
-		if (fElpasedAppTime >= 10.0f)
-		{
-			for (int i = 0; i < PARTICLE_SIZE; ++i)
-				particles[i]._Pos = float3(0.0f, 0.0f, 0.0f);
-
-			dStartAppTime = GetTickCount();
-		}
-
-		for (int i = 0; i < PARTICLE_SIZE; ++i)
-			particles[i]._Pos = particles[i]._Pos + particles[i]._Vel *(float)dElpasedFrameTime * 0.1f;
-
-		glEnableClientState(GL_VERTEX_ARRAY);
-		glVertexPointer(3, GL_FLOAT, sizeof(Particle), &particles[0]._Pos._x);
-
-		glEnableClientState(GL_COLOR_ARRAY);
-		glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(Particle), &particles[0]._r);
-		
-		glDrawArrays(GL_POINTS, 0, PARTICLE_SIZE);
-
-		//禁用点精灵
-		glDisable(GL_POINT_SPRITE_ARB);
+		Render3D(_w, _h);
+		Render2D(_w, _h);
 	}
 
 	void Smile::XRenderWindow::End()
 	{
+		glDeleteTextures(1, &_texture0);
 		glDeleteTextures(1, &_texture1);
+		glDeleteTextures(1, &_texture2);
 	}
 }
 
