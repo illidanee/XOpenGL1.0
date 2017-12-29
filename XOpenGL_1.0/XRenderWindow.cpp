@@ -12,6 +12,9 @@ namespace Smile
 	GLuint _texture1;
 	GLuint _texture2;
 
+	GLuint _3DList;
+	GLuint _2DList;
+
 	//透视投影绘制3D
 	void Render3D(int w, int h)
 	{
@@ -125,6 +128,16 @@ namespace Smile
 			glBindTexture(GL_TEXTURE_2D, 0);
 		}
 
+		//创建显示列表
+		_3DList = 1;
+		glNewList(_3DList, GL_COMPILE);
+			Render3D(_w, _h);
+		glEndList();
+
+		_2DList = 2;
+		glNewList(_2DList, GL_COMPILE);
+			Render2D(_w, _h);
+		glEndList();
 	}
 
 	void Smile::XRenderWindow::Render()
@@ -133,8 +146,18 @@ namespace Smile
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		Render3D(_w, _h);
-		Render2D(_w, _h);
+		//Render3D(_w, _h);
+		//Render2D(_w, _h);
+
+		//调用显示列表
+
+		////-1 单独调用。
+		//glCallList(_3DList);
+		//glCallList(_2DList);
+
+		//-2 整体调用。
+		unsigned int array[] = { _3DList, _2DList };
+		glCallLists(2, GL_UNSIGNED_INT, array);
 	}
 
 	void Smile::XRenderWindow::End()
@@ -142,6 +165,9 @@ namespace Smile
 		glDeleteTextures(1, &_texture0);
 		glDeleteTextures(1, &_texture1);
 		glDeleteTextures(1, &_texture2);
+
+		glDeleteLists(_3DList, 1);
+		glDeleteLists(_2DList, 1);
 	}
 }
 
