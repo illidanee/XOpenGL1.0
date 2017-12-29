@@ -4,84 +4,148 @@ namespace Smile
 {
 	struct Vertex
 	{
-		float _x, _y, _z;
-		float _u, _v;
+		float x, y, z;
+		float u, v;
+		float r, g, b;
+	};
+
+	Vertex g_cubeVertices[] =
+	{
+		{ -1.0f,-1.0f, 1.0f,0.0f, 0.0f,1.0f, 0.0f, 0.0f },
+		{ 1.0f,-1.0f, 1.0f,1.0f, 0.0f,1.0f, 0.0f, 0.0f },
+		{ 1.0f, 1.0f, 1.0f,1.0f, 1.0f,1.0f, 0.0f, 0.0f },
+		{ -1.0f, 1.0f, 1.0f,0.0f, 1.0f,1.0f, 0.0f, 0.0f },
+
+		{ -1.0f,-1.0f,-1.0f,1.0f, 0.0f,0.0f, 1.0f, 0.0f },
+		{ -1.0f, 1.0f,-1.0f,1.0f, 1.0f,0.0f, 1.0f, 0.0f },
+		{ 1.0f, 1.0f,-1.0f,0.0f, 1.0f,0.0f, 1.0f, 0.0f },
+		{ 1.0f,-1.0f,-1.0f,0.0f, 0.0f,0.0f, 1.0f, 0.0f },
+
+		{ -1.0f, 1.0f,-1.0f,0.0f, 1.0f,0.0f, 0.0f, 1.0f },
+		{ -1.0f, 1.0f, 1.0f,0.0f, 0.0f,0.0f, 0.0f, 1.0f },
+		{ 1.0f, 1.0f, 1.0f,1.0f, 0.0f,0.0f, 0.0f, 1.0f },
+		{ 1.0f, 1.0f,-1.0f,1.0f, 1.0f,0.0f, 0.0f, 1.0f },
+
+		{ -1.0f,-1.0f,-1.0f,1.0f, 1.0f,1.0f, 1.0f, 0.0f },
+		{ 1.0f,-1.0f,-1.0f,0.0f, 1.0f,1.0f, 1.0f, 0.0f },
+		{ 1.0f,-1.0f, 1.0f,0.0f, 0.0f,1.0f, 1.0f, 0.0f },
+		{ -1.0f,-1.0f, 1.0f,1.0f, 0.0f,1.0f, 1.0f, 0.0f },
+
+		{ 1.0f,-1.0f,-1.0f,1.0f, 0.0f,1.0f, 0.0f, 1.0f },
+		{ 1.0f, 1.0f,-1.0f,1.0f, 1.0f,1.0f, 0.0f, 1.0f },
+		{ 1.0f, 1.0f, 1.0f,0.0f, 1.0f,1.0f, 0.0f, 1.0f },
+		{ 1.0f,-1.0f, 1.0f,0.0f, 0.0f,1.0f, 0.0f, 1.0f },
+
+		{ -1.0f,-1.0f,-1.0f,0.0f, 0.0f,0.0f, 1.0f, 1.0f },
+		{ -1.0f,-1.0f, 1.0f,1.0f, 0.0f,0.0f, 1.0f, 1.0f },
+		{ -1.0f, 1.0f, 1.0f,1.0f, 1.0f,0.0f, 1.0f, 1.0f },
+		{ -1.0f, 1.0f,-1.0f,0.0f, 1.0f,0.0f, 1.0f, 1.0f }
 	};
 
 	GLuint _texture0;
-	GLuint _texture1;
-	GLuint _texture2;
 
-	GLuint _3DList;
-	GLuint _2DList;
+	GLuint _vbo;
 
-	//透视投影绘制3D
-	void Render3D(int w, int h)
+	void CheckError()
 	{
-		//启用深度测试
-		glEnable(GL_DEPTH_TEST);
+		GLenum err = glGetError();
+		if (err != GL_NO_ERROR)
+		{
+			switch (err)
+			{
+			case GL_INVALID_ENUM:
+				printf("GL Error: GL_INVALID_ENUM.\n");
+				break;
+			case GL_INVALID_VALUE:
+				printf("GL Error: GL_INVALID_VALUE.\n");
+				break;
+			case GL_INVALID_OPERATION:
+				printf("GL Error: GL_INVALID_OPERATION.\n");
+				break;
+			case GL_STACK_OVERFLOW:
+				printf("GL Error: GL_STACK_OVERFLOW.\n");
+				break;
+			case GL_STACK_UNDERFLOW:
+				printf("GL Error: GL_STACK_UNDERFLOW.\n");
+				break;
+			case GL_OUT_OF_MEMORY:
+				printf("GL Error: GL_OUT_OF_MEMORY.\n");
+				break;
+			default:
+				printf("GL Error!\n");
+				break;
+			}
+		}
+	}
 
-		//设置投影矩阵
-		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
-		gluPerspective(60.0f, (float)w / h, 0.01f, 1000.0f);
-
-		//设置模型矩阵
+	void DrawOnCPU()
+	{
+		//模型矩阵
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
-		glTranslatef(0.0f, 0.0f, -5.0f);
+		glTranslatef(-2.0f, 0.0f, -5);
+
+		//绑定数据
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glVertexPointer(3, GL_FLOAT, sizeof(Vertex), &g_cubeVertices[0].x);
+		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+		glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), &g_cubeVertices[0].u);
+		glEnableClientState(GL_COLOR_ARRAY);
+		glColorPointer(3, GL_FLOAT, sizeof(Vertex), &g_cubeVertices[0].r);
+
+		//绘制
+		glBindTexture(GL_TEXTURE_2D, _texture0);
+
+		glDrawArrays(GL_QUADS, 0, 24);
+
+		glBindTexture(GL_TEXTURE_2D, 0);
 
 		glDisableClientState(GL_VERTEX_ARRAY);
 		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-
-		glBindTexture(GL_TEXTURE_2D, _texture0);
-
-		glBegin(GL_TRIANGLE_STRIP);
-			glTexCoord2f(0.0f, 16.0f);	glVertex3f(-16, -1, -16);
-			glTexCoord2f(0.0f, 0.0f);	glVertex3f(-10, -1, 16);
-			glTexCoord2f(16.0f, 16.0f);	glVertex3f(16, -1, -16);
-			glTexCoord2f(16.0f, 0.0f);	glVertex3f(16, -1, 16);
-		glEnd();
+		glDisableClientState(GL_COLOR_ARRAY);
 	}
 
-	//正交投影绘制2D
-	void Render2D(int w, int h)
+	void BeginDrawOnGPU()
 	{
-		//关闭深度测试
-		glDisable(GL_DEPTH_TEST);
+		glGenBuffers(1, &_vbo);
+		glBindBuffer(GL_ARRAY_BUFFER, _vbo);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(g_cubeVertices), g_cubeVertices, GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+	}
 
-		//正交投影绘制平面
-		glMatrixMode(GL_PROJECTION);
+	void DrawOnGPU()
+	{
+		//模型矩阵
+		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
-		glOrtho(0, w, 0, h, -100, 100);
+		glTranslatef(2.0f, 0.0f, -5);
 
-		//***
-		//		纹理坐标错误可能会造成画片不正确。常见的现象是混合后画面出现对角斜线，并在对角斜线两侧表现相反的显示结果。
-		//***
-		Vertex  vert[] =
-		{
-			{ 0,			0,			20,		0.0f, 0.0f },
-			{ 0,			(float)h,	20,		0.0f, 1.0f },
-			{ (float)w,		0,			20,		1.0f, 0.0f },
-			{ (float)w,		(float)h,	20,		1.0f, 1.0f },
-		};
-
+		glBindBuffer(GL_ARRAY_BUFFER, _vbo);
+		
 		glEnableClientState(GL_VERTEX_ARRAY);
-		glVertexPointer(3, GL_FLOAT, sizeof(Vertex), &vert[0]._x);
+		glVertexPointer(3, GL_FLOAT, sizeof(Vertex), (const void*)0);
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-		glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), &vert[0]._u);
+		glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), (const void*)(sizeof(float) * 3));
+		glEnableClientState(GL_COLOR_ARRAY);
+		glColorPointer(3, GL_FLOAT, sizeof(Vertex), (const void*)(sizeof(float) * 5));
 
-		glEnable(GL_BLEND);
+		//绘制
+		glBindTexture(GL_TEXTURE_2D, _texture0);
 
-		glBlendFunc(GL_DST_COLOR, GL_ZERO);
-		glBindTexture(GL_TEXTURE_2D, _texture1);
-		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		glDrawArrays(GL_QUADS, 0, 24);
 
-		glBlendFunc(GL_ONE, GL_ONE);
-		glBindTexture(GL_TEXTURE_2D, _texture2);
-		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		glBindTexture(GL_TEXTURE_2D, 0);
 
-		glDisable(GL_BLEND);
+		glDisableClientState(GL_VERTEX_ARRAY);
+		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+		glDisableClientState(GL_COLOR_ARRAY);
+
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+	}
+	
+	void EndDrawOnGPU()
+	{
+		glDeleteBuffers(1, &_vbo);
 	}
 
 	void Smile::XRenderWindow::Begin()
@@ -102,42 +166,9 @@ namespace Smile
 			glBindTexture(GL_TEXTURE_2D, 0);
 		}
 
-		{
-			XResource::LoadTextureFile("../Resources/CrossHairMask.bmp", &pBuffer, &w, &h);
+		BeginDrawOnGPU();
 
-			//读取纹理数据
-			glEnable(GL_TEXTURE_2D);
-			glGenTextures(1, &_texture1);
-			glBindTexture(GL_TEXTURE_2D, _texture1);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, pBuffer);
-			glBindTexture(GL_TEXTURE_2D, 0);
-		}
-
-		{
-			XResource::LoadTextureFile("../Resources/CrossHair.bmp", &pBuffer, &w, &h);
-
-			//读取纹理数据
-			glEnable(GL_TEXTURE_2D);
-			glGenTextures(1, &_texture2);
-			glBindTexture(GL_TEXTURE_2D, _texture2);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, pBuffer);
-			glBindTexture(GL_TEXTURE_2D, 0);
-		}
-
-		//创建显示列表
-		_3DList = 1;
-		glNewList(_3DList, GL_COMPILE);
-			Render3D(_w, _h);
-		glEndList();
-
-		_2DList = 2;
-		glNewList(_2DList, GL_COMPILE);
-			Render2D(_w, _h);
-		glEndList();
+		CheckError();
 	}
 
 	void Smile::XRenderWindow::Render()
@@ -146,28 +177,26 @@ namespace Smile
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		//Render3D(_w, _h);
-		//Render2D(_w, _h);
+		//正交投影绘制平面
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		gluPerspective(60.0f, float(_w) / float(_h), 0.1f, 100.0f);
 
-		//调用显示列表
+		//******************************************************************************************************************
+		//这里有一个Bug，如果注释掉DrawOnCPU（），点击关闭主窗口会Crash。但是如果不注释则没有问题。OpenGL glGetError() 无错误提示。
+		//DrawOnCPU(); 
+		DrawOnGPU();		
 
-		////-1 单独调用。
-		//glCallList(_3DList);
-		//glCallList(_2DList);
-
-		//-2 整体调用。
-		unsigned int array[] = { _3DList, _2DList };
-		glCallLists(2, GL_UNSIGNED_INT, array);
+		CheckError();
 	}
 
 	void Smile::XRenderWindow::End()
 	{
 		glDeleteTextures(1, &_texture0);
-		glDeleteTextures(1, &_texture1);
-		glDeleteTextures(1, &_texture2);
 
-		glDeleteLists(_3DList, 1);
-		glDeleteLists(_2DList, 1);
+		EndDrawOnGPU();
+
+		CheckError();
 	}
 }
 
