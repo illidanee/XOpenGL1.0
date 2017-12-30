@@ -11,40 +11,29 @@ namespace Smile
 
 	Vertex g_cubeVertices[] =
 	{
-		{ -1.0f,-1.0f, 1.0f,0.0f, 0.0f,1.0f, 0.0f, 0.0f },
-		{ 1.0f,-1.0f, 1.0f,1.0f, 0.0f,1.0f, 0.0f, 0.0f },
-		{ 1.0f, 1.0f, 1.0f,1.0f, 1.0f,1.0f, 0.0f, 0.0f },
-		{ -1.0f, 1.0f, 1.0f,0.0f, 1.0f,1.0f, 0.0f, 0.0f },
-
-		{ -1.0f,-1.0f,-1.0f,1.0f, 0.0f,0.0f, 1.0f, 0.0f },
-		{ -1.0f, 1.0f,-1.0f,1.0f, 1.0f,0.0f, 1.0f, 0.0f },
-		{ 1.0f, 1.0f,-1.0f,0.0f, 1.0f,0.0f, 1.0f, 0.0f },
-		{ 1.0f,-1.0f,-1.0f,0.0f, 0.0f,0.0f, 1.0f, 0.0f },
-
-		{ -1.0f, 1.0f,-1.0f,0.0f, 1.0f,0.0f, 0.0f, 1.0f },
-		{ -1.0f, 1.0f, 1.0f,0.0f, 0.0f,0.0f, 0.0f, 1.0f },
-		{ 1.0f, 1.0f, 1.0f,1.0f, 0.0f,0.0f, 0.0f, 1.0f },
-		{ 1.0f, 1.0f,-1.0f,1.0f, 1.0f,0.0f, 0.0f, 1.0f },
-
-		{ -1.0f,-1.0f,-1.0f,1.0f, 1.0f,1.0f, 1.0f, 0.0f },
-		{ 1.0f,-1.0f,-1.0f,0.0f, 1.0f,1.0f, 1.0f, 0.0f },
-		{ 1.0f,-1.0f, 1.0f,0.0f, 0.0f,1.0f, 1.0f, 0.0f },
-		{ -1.0f,-1.0f, 1.0f,1.0f, 0.0f,1.0f, 1.0f, 0.0f },
-
-		{ 1.0f,-1.0f,-1.0f,1.0f, 0.0f,1.0f, 0.0f, 1.0f },
-		{ 1.0f, 1.0f,-1.0f,1.0f, 1.0f,1.0f, 0.0f, 1.0f },
-		{ 1.0f, 1.0f, 1.0f,0.0f, 1.0f,1.0f, 0.0f, 1.0f },
-		{ 1.0f,-1.0f, 1.0f,0.0f, 0.0f,1.0f, 0.0f, 1.0f },
-
-		{ -1.0f,-1.0f,-1.0f,0.0f, 0.0f,0.0f, 1.0f, 1.0f },
-		{ -1.0f,-1.0f, 1.0f,1.0f, 0.0f,0.0f, 1.0f, 1.0f },
-		{ -1.0f, 1.0f, 1.0f,1.0f, 1.0f,0.0f, 1.0f, 1.0f },
-		{ -1.0f, 1.0f,-1.0f,0.0f, 1.0f,0.0f, 1.0f, 1.0f }
+		{ -1.0f,-1.0f, 1.0f,  0.0f,0.0f, 1.0f,0.0f,0.0f, }, // 0
+		{ 1.0f,-1.0f, 1.0f ,  0.0f,0.0f, 0.0f,1.0f,0.0f, }, // 1
+		{ 1.0f, 1.0f, 1.0f ,  0.0f,0.0f, 0.0f,0.0f,1.0f, }, // 2
+		{ -1.0f, 1.0f, 1.0f,  0.0f,0.0f, 1.0f,1.0f,0.0f, }, // 3
+		{ -1.0f,-1.0f,-1.0f,  0.0f,0.0f, 1.0f,0.0f,1.0f, }, // 4
+		{ -1.0f, 1.0f,-1.0f,  0.0f,0.0f, 0.0f,1.0f,1.0f, }, // 5
+		{ 1.0f, 1.0f,-1.0f ,  0.0f,0.0f, 1.0f,1.0f,1.0f, }, // 6
+		{ 1.0f,-1.0f,-1.0f ,  0.0f,0.0f, 1.0f,0.0f,0.0f, }, // 7
 	};
 
-	GLuint _texture0;
+	GLubyte g_cubeIndices[] =
+	{
+		0, 1, 2, 3, // Quad 0
+		4, 5, 6, 7, // Quad 1
+		5, 3, 2, 6, // Quad 2
+		4, 7, 1, 0, // Quad 3
+		7, 6, 2, 1, // Quad 4
+		4, 0, 3, 5 // Quad 5
+	};
 
-	GLuint _vbo;
+	GLuint _vbo1;
+	GLuint _vbo2;
+	GLuint _ibo2;
 
 	void CheckError()
 	{
@@ -88,29 +77,32 @@ namespace Smile
 		//绑定数据
 		glEnableClientState(GL_VERTEX_ARRAY);
 		glVertexPointer(3, GL_FLOAT, sizeof(Vertex), &g_cubeVertices[0].x);
-		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-		glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), &g_cubeVertices[0].u);
 		glEnableClientState(GL_COLOR_ARRAY);
 		glColorPointer(3, GL_FLOAT, sizeof(Vertex), &g_cubeVertices[0].r);
 
 		//绘制
-		glBindTexture(GL_TEXTURE_2D, _texture0);
-
-		glDrawArrays(GL_QUADS, 0, 24);
-
-		glBindTexture(GL_TEXTURE_2D, 0);
+		glDrawElements(GL_QUADS, 24, GL_UNSIGNED_BYTE, g_cubeIndices);
 
 		glDisableClientState(GL_VERTEX_ARRAY);
-		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 		glDisableClientState(GL_COLOR_ARRAY);
 	}
 
 	void BeginDrawOnGPU()
 	{
-		glGenBuffers(1, &_vbo);
-		glBindBuffer(GL_ARRAY_BUFFER, _vbo);
+		glGenBuffers(1, &_vbo1);
+		glBindBuffer(GL_ARRAY_BUFFER, _vbo1);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(g_cubeVertices), g_cubeVertices, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		glGenBuffers(1, &_vbo2);
+		glBindBuffer(GL_ARRAY_BUFFER, _vbo2);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(g_cubeVertices), g_cubeVertices, GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		glGenBuffers(1, &_ibo2);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ibo2);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(g_cubeIndices), g_cubeIndices, GL_STATIC_DRAW);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 
 	void DrawOnGPU()
@@ -120,52 +112,33 @@ namespace Smile
 		glLoadIdentity();
 		glTranslatef(2.0f, 0.0f, -5);
 
-		glBindBuffer(GL_ARRAY_BUFFER, _vbo);
+		glBindBuffer(GL_ARRAY_BUFFER, _vbo2);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ibo2);
 
 		glEnableClientState(GL_VERTEX_ARRAY);
 		glVertexPointer(3, GL_FLOAT, sizeof(Vertex), (const void*)0);
-		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-		glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), (const void*)(sizeof(float) * 3));
 		glEnableClientState(GL_COLOR_ARRAY);
 		glColorPointer(3, GL_FLOAT, sizeof(Vertex), (const void*)(sizeof(float) * 5));
 
 		//绘制
-		glBindTexture(GL_TEXTURE_2D, _texture0);
-
-		glDrawArrays(GL_QUADS, 0, 24);
-
-		glBindTexture(GL_TEXTURE_2D, 0);
+		glDrawElements(GL_QUADS, 24, GL_UNSIGNED_BYTE, 0);
 
 		glDisableClientState(GL_VERTEX_ARRAY);
-		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 		glDisableClientState(GL_COLOR_ARRAY);
 
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
 
 	void EndDrawOnGPU()
 	{
-		glDeleteBuffers(1, &_vbo);
+		glDeleteBuffers(1, &_vbo1);
+		glDeleteBuffers(1, &_vbo2);
+		glDeleteBuffers(1, &_ibo2);
 	}
 
 	void Smile::XRenderWindow::Begin()
 	{
-		char* pBuffer;
-		int w, h;
-
-		{
-			XResource::LoadTextureFile("../Resources/floor.bmp", &pBuffer, &w, &h);
-
-			//读取纹理数据
-			glEnable(GL_TEXTURE_2D);
-			glGenTextures(1, &_texture0);
-			glBindTexture(GL_TEXTURE_2D, _texture0);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, pBuffer);
-			glBindTexture(GL_TEXTURE_2D, 0);
-		}
-
 		BeginDrawOnGPU();
 
 		CheckError();
@@ -184,7 +157,7 @@ namespace Smile
 
 		//******************************************************************************************************************
 		//这里有一个Bug，如果注释掉DrawOnCPU（），点击关闭主窗口会Crash。但是如果不注释则没有问题。OpenGL glGetError() 无错误提示。
-		DrawOnCPU(); 
+		DrawOnCPU();
 		DrawOnGPU();
 
 		CheckError();
@@ -192,8 +165,6 @@ namespace Smile
 
 	void Smile::XRenderWindow::End()
 	{
-		glDeleteTextures(1, &_texture0);
-
 		EndDrawOnGPU();
 
 		CheckError();
