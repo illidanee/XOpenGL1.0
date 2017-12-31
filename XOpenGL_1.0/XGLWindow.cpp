@@ -140,7 +140,7 @@ namespace Smile
 	void XGLWindow::_CheckError(const char *file, const int line)
 	{
 		GLenum error = glGetError();
-		while (error != GL_NO_ERROR)
+		if (error != GL_NO_ERROR)
 		{
 			switch (error)
 			{
@@ -165,8 +165,9 @@ namespace Smile
 			case GL_INVALID_FRAMEBUFFER_OPERATION: 
 				MessageBox(0, _T("INVALID_FRAMEBUFFER_OPERATION!"), 0, MB_OK);
 				break; 
+			default:
+				MessageBox(0, _T("Other Error!"), 0, MB_OK);
 			}
-			MessageBox(0, _T("Other Error!"), 0, MB_OK);
 		}
 	}
 
