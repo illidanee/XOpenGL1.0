@@ -1,6 +1,6 @@
 #include "XRenderWindow.h"
 
-#include "XGLPBuffer.h"
+#include "XGLFrameBufferObject.h"
 
 namespace Smile
 {
@@ -19,10 +19,9 @@ namespace Smile
 	};
 
 	GLuint _texture;
-
-	XGLPBuffer _pBuffer;
-
 	GLuint _dynamic;
+
+	XGLFrameBufferObject _fbo;
 
 	void DrawOnCPU(GLuint texture)
 	{
@@ -63,9 +62,6 @@ namespace Smile
 			glBindTexture(GL_TEXTURE_2D, 0);
 		}
 
-		_pBuffer.Init(_hWnd, _content.GetHDC(), _content.GetHGLRC(), _w, _h);
-		_pBuffer.MakeCurrent();
-
 		glEnable(GL_TEXTURE_2D);
 		{
 			glGenTextures(1, &_dynamic);
@@ -75,14 +71,15 @@ namespace Smile
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _w, _h, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 			glBindTexture(GL_TEXTURE_2D, 0);
 		}
+
+		_fbo.Init(_w, _h);
 	}
 
 	void Smile::XRenderWindow::Render()
 	{
-		_pBuffer.MakeCurrent();
+		_fbo.Begin(_dynamic);
 
 		//清空
-		glEnable(GL_DEPTH_TEST);
 		glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -93,13 +90,9 @@ namespace Smile
 
 		DrawOnCPU(_texture);
 
-		//------------------------------------------离屏渲染------------------------------------------
-		glBindTexture(GL_TEXTURE_2D, _dynamic);
-		glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, _pBuffer.GetW(), _pBuffer.GetH());
-		glBindTexture(GL_TEXTURE_2D, 0);
+		_fbo.End();
 
-		_content.MakeCurrent();
-		glEnable(GL_DEPTH_TEST);
+		//清空
 		glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -113,12 +106,10 @@ namespace Smile
 
 	void Smile::XRenderWindow::End()
 	{
-		_pBuffer.MakeCurrent();
 		glDeleteTextures(1, &_texture);
+		glDeleteTextures(1, &_dynamic);
 
-		//--BUG - 1282
-		//		此处调用会有1282错误产生。
-		//_pBuffer.Destroy();
+		_fbo.Destroy();
 	}
 }
 

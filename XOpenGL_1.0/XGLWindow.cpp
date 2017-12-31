@@ -193,7 +193,7 @@ namespace Smile
 				//调用自身事件处理。
 				pThis->Event(hWnd, uMsg, wParam, lParam);
 
-				if (uMsg == WM_DESTROY && pThis->_die == false)
+				if (uMsg == WM_CLOSE && pThis->_die == false)
 				{
 					pThis->_die = true;
 				}
