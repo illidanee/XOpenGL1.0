@@ -13,6 +13,7 @@ namespace Smile
 	{
 	public:
 		XGLContent();
+		~XGLContent();
 
 		void Construct(HWND hWnd);
 		void ConstructMSAA(HWND hWnd);
@@ -28,5 +29,10 @@ namespace Smile
 		HWND _hWnd;
 		HDC _hDC;
 		HGLRC _hGLRC;
+
+	public:
+		HWND GetHWND() { return _hWnd; }
+		HDC GetHDC() { return _hDC; }
+		HGLRC GetHGLRC() { return _hGLRC; }
 	};
 }

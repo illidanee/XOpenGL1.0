@@ -17,6 +17,7 @@ namespace Smile
 		void Destroy();
 		void MakeCurrent();
 
+	private:
 		HWND _hParentWnd;
 		HDC _hParentDC;
 		HGLRC _hParentGLRC;
@@ -26,5 +27,9 @@ namespace Smile
 		HGLRC _hGLRC;
 		int _w;
 		int _h;
+
+	public:
+		int GetW() { return _w; }
+		int GetH() { return _h; }
 	};
 }

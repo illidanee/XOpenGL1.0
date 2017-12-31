@@ -9,6 +9,11 @@ namespace Smile
 		_hGLRC = 0;
 	}
 
+	XGLContent::~XGLContent()
+	{
+
+	}
+
 	void XGLContent::Construct(HWND hWnd)
 	{
 		//初始化OpenGL环境
