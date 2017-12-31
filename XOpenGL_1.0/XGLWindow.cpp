@@ -137,25 +137,37 @@ namespace Smile
 		DeleteCriticalSection(&_CS);
 	}
 
-	GLenum XGLWindow::_CheckError(const char *file, int line)
+	void XGLWindow::_CheckError(const char *file, const int line)
 	{
-		GLenum errorCode;
-		while ((errorCode = glGetError()) != GL_NO_ERROR)
+		GLenum error = glGetError();
+		while (error != GL_NO_ERROR)
 		{
-			std::string error;
-			switch (errorCode)
+			switch (error)
 			{
-			case GL_INVALID_ENUM:                  error = "INVALID_ENUM"; break;
-			case GL_INVALID_VALUE:                 error = "INVALID_VALUE"; break;
-			case GL_INVALID_OPERATION:             error = "INVALID_OPERATION"; break;
-			case GL_STACK_OVERFLOW:                error = "STACK_OVERFLOW"; break;
-			case GL_STACK_UNDERFLOW:               error = "STACK_UNDERFLOW"; break;
-			case GL_OUT_OF_MEMORY:                 error = "OUT_OF_MEMORY"; break;
-			case GL_INVALID_FRAMEBUFFER_OPERATION: error = "INVALID_FRAMEBUFFER_OPERATION"; break;
+			case GL_INVALID_ENUM:                  
+				MessageBox(0, _T("INVALID_ENUM!"), 0, MB_OK);
+				break;
+			case GL_INVALID_VALUE:                
+				MessageBox(0, _T("INVALID_VALUE!"), 0, MB_OK);
+				break; 
+			case GL_INVALID_OPERATION:             
+				MessageBox(0, _T("INVALID_OPERATION!"), 0, MB_OK);
+				break; 
+			case GL_STACK_OVERFLOW:                
+				MessageBox(0, _T("STACK_OVERFLOW!"), 0, MB_OK);
+				break; 
+			case GL_STACK_UNDERFLOW:               
+				MessageBox(0, _T("STACK_UNDERFLOW!"), 0, MB_OK);
+				break; 
+			case GL_OUT_OF_MEMORY:                 
+				MessageBox(0, _T("OUT_OF_MEMORY!"), 0, MB_OK);
+				break; 
+			case GL_INVALID_FRAMEBUFFER_OPERATION: 
+				MessageBox(0, _T("INVALID_FRAMEBUFFER_OPERATION!"), 0, MB_OK);
+				break; 
 			}
-			//std::cout << error << " | " << file << " (" << line << ")" << std::endl;
+			MessageBox(0, _T("Other Error!"), 0, MB_OK);
 		}
-		return errorCode;
 	}
 
 	LRESULT CALLBACK XGLWindow::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -270,9 +282,10 @@ namespace Smile
 
 	void XGLWindow::BeginInner()
 	{
+		_content.MakeCurrent();
 		_content.Begin();
+		
 		Begin();
-
 		CheckError();
 	}
 
@@ -287,10 +300,12 @@ namespace Smile
 
 	void XGLWindow::EndInner()
 	{
-		End();
-		_content.End();
+		_content.MakeCurrent();
 
+		End();
 		CheckError();
+
+		_content.End();
 	}
 
 	void XGLWindow::Event(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)

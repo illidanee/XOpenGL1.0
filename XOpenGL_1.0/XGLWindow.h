@@ -41,7 +41,7 @@ namespace Smile
 		}
 		static void Update();
 
-		GLenum _CheckError(const char *file, int line);
+		void _CheckError(const char *file, const int line);
 		#define CheckError() _CheckError(__FILE__, __LINE__) 
 
 	protected:
