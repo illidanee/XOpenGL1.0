@@ -137,6 +137,27 @@ namespace Smile
 		DeleteCriticalSection(&_CS);
 	}
 
+	GLenum XGLWindow::_CheckError(const char *file, int line)
+	{
+		GLenum errorCode;
+		while ((errorCode = glGetError()) != GL_NO_ERROR)
+		{
+			std::string error;
+			switch (errorCode)
+			{
+			case GL_INVALID_ENUM:                  error = "INVALID_ENUM"; break;
+			case GL_INVALID_VALUE:                 error = "INVALID_VALUE"; break;
+			case GL_INVALID_OPERATION:             error = "INVALID_OPERATION"; break;
+			case GL_STACK_OVERFLOW:                error = "STACK_OVERFLOW"; break;
+			case GL_STACK_UNDERFLOW:               error = "STACK_UNDERFLOW"; break;
+			case GL_OUT_OF_MEMORY:                 error = "OUT_OF_MEMORY"; break;
+			case GL_INVALID_FRAMEBUFFER_OPERATION: error = "INVALID_FRAMEBUFFER_OPERATION"; break;
+			}
+			//std::cout << error << " | " << file << " (" << line << ")" << std::endl;
+		}
+		return errorCode;
+	}
+
 	LRESULT CALLBACK XGLWindow::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		if (uMsg == WM_CREATE)
@@ -235,6 +256,8 @@ namespace Smile
 		_die = false;
 
 		_content.ConstructMSAA(_hWnd);
+
+		CheckError();
 	}
 
 	void XGLWindow::Register()
@@ -249,6 +272,8 @@ namespace Smile
 	{
 		_content.Begin();
 		Begin();
+
+		CheckError();
 	}
 
 	void XGLWindow::RenderInner()
@@ -256,12 +281,16 @@ namespace Smile
 		_content.MakeCurrent();
 		Render();
 		_content.SwapBuffer();
+
+		CheckError();
 	}
 
 	void XGLWindow::EndInner()
 	{
 		End();
 		_content.End();
+
+		CheckError();
 	}
 
 	void XGLWindow::Event(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -276,8 +305,7 @@ namespace Smile
 
 	void XGLWindow::Render()
 	{	
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
+
 	}
 
 	void XGLWindow::End()

@@ -41,9 +41,11 @@ namespace Smile
 		}
 		static void Update();
 
+		GLenum _CheckError(const char *file, int line);
+		#define CheckError() _CheckError(__FILE__, __LINE__) 
+
 	protected:
 		static LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-
 	
 /*
 	³ÉÔ±Çø

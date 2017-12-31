@@ -35,38 +35,6 @@ namespace Smile
 	GLuint _vbo2;
 	GLuint _ibo2;
 
-	void CheckError()
-	{
-		GLenum err = glGetError();
-		if (err != GL_NO_ERROR)
-		{
-			switch (err)
-			{
-			case GL_INVALID_ENUM:
-				printf("GL Error: GL_INVALID_ENUM.\n");
-				break;
-			case GL_INVALID_VALUE:
-				printf("GL Error: GL_INVALID_VALUE.\n");
-				break;
-			case GL_INVALID_OPERATION:
-				printf("GL Error: GL_INVALID_OPERATION.\n");
-				break;
-			case GL_STACK_OVERFLOW:
-				printf("GL Error: GL_STACK_OVERFLOW.\n");
-				break;
-			case GL_STACK_UNDERFLOW:
-				printf("GL Error: GL_STACK_UNDERFLOW.\n");
-				break;
-			case GL_OUT_OF_MEMORY:
-				printf("GL Error: GL_OUT_OF_MEMORY.\n");
-				break;
-			default:
-				printf("GL Error!\n");
-				break;
-			}
-		}
-	}
-
 	void DrawOnCPU()
 	{
 		//模型矩阵
@@ -140,8 +108,6 @@ namespace Smile
 	void Smile::XRenderWindow::Begin()
 	{
 		BeginDrawOnGPU();
-
-		CheckError();
 	}
 
 	void Smile::XRenderWindow::Render()
@@ -159,15 +125,11 @@ namespace Smile
 		//这里有一个Bug，如果注释掉DrawOnCPU（），点击关闭主窗口会Crash。但是如果不注释则没有问题。OpenGL glGetError() 无错误提示。
 		DrawOnCPU();
 		DrawOnGPU();
-
-		CheckError();
 	}
 
 	void Smile::XRenderWindow::End()
 	{
 		EndDrawOnGPU();
-
-		CheckError();
 	}
 }
 
