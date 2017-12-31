@@ -157,6 +157,7 @@
     <ClCompile Include="glew.c" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="XGLContent.cpp" />
+    <ClCompile Include="XGLPBuffer.cpp" />
     <ClCompile Include="XGLWindow.cpp" />
     <ClCompile Include="XLog.cpp" />
     <ClCompile Include="XRenderWindow.cpp" />
@@ -165,6 +166,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="XGLContent.h" />
+    <ClInclude Include="XGLPBuffer.h" />
     <ClInclude Include="XGLWindow.h" />
     <ClInclude Include="XLog.h" />
     <ClInclude Include="XRenderWindow.h" />
