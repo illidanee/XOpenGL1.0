@@ -23,6 +23,8 @@ namespace Smile
 
 	XGLFrameBufferObject _fbo;
 
+	GLuint _pbo;
+
 	void DrawOnCPU(GLuint texture)
 	{
 		//Ä£ÐÍ¾ØÕó
@@ -73,6 +75,11 @@ namespace Smile
 		}
 
 		_fbo.Init(_w, _h);
+
+		glGenBuffers(1, &_pbo);
+		glBindBuffer(GL_PIXEL_PACK_BUFFER, _pbo);
+		glBufferData(GL_PIXEL_PACK_BUFFER, _w * _h * 4, 0, GL_STREAM_READ);
+		glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
 	}
 
 	void Smile::XRenderWindow::Render()
@@ -91,10 +98,15 @@ namespace Smile
 		DrawOnCPU(_texture);
 
 		//±£´æÍ¼Æ¬
-		char* pBuffer = new char[_w * _h * 4];
-		memset(pBuffer, 0, _w * _h * 4);
-		glReadPixels(0, 0, _w, _h, GL_RGBA, GL_UNSIGNED_BYTE, pBuffer);
-		XResource::SaveTextureFile("D:/abc1.png", pBuffer, _w, _h);
+		glBindBuffer(GL_PIXEL_PACK_BUFFER, _pbo);
+		glReadPixels(0, 0, _w, _h, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+		void* pData = glMapBuffer(GL_PIXEL_PACK_BUFFER, GL_READ_ONLY);
+		if (pData)
+		{
+			XResource::SaveTextureFile("D:/abc1.png", (char*)pData, _w, _h);
+		}
+		glUnmapBuffer(GL_PIXEL_PACK_BUFFER);
+		
 
 		_fbo.End();
 
@@ -110,10 +122,14 @@ namespace Smile
 		DrawOnCPU(_dynamic);
 
 		//±£´æÍ¼Æ¬
-		//char* pBuffer = new char[_w * _h * 4];
-		memset(pBuffer, 0, _w * _h * 4);
-		glReadPixels(0, 0, _w, _h, GL_RGBA, GL_UNSIGNED_BYTE, pBuffer);
-		XResource::SaveTextureFile("D:/abc2.png", pBuffer, _w, _h);
+		glBindBuffer(GL_PIXEL_PACK_BUFFER, _pbo);
+		glReadPixels(0, 0, _w, _h, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+		pData = glMapBuffer(GL_PIXEL_PACK_BUFFER, GL_READ_ONLY);
+		if (pData)
+		{
+			XResource::SaveTextureFile("D:/abc2.png", (char*)pData, _w, _h);
+		}
+		glUnmapBuffer(GL_PIXEL_PACK_BUFFER);
 	}
 
 	void Smile::XRenderWindow::End()
