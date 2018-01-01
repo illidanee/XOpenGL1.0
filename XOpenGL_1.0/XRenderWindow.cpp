@@ -23,7 +23,9 @@ namespace Smile
 
 	XGLFrameBufferObject _fbo;
 
-	GLuint _pbo;
+	GLuint _pbo[2];
+	int _DMA;
+	int _Read;
 
 	void DrawOnCPU(GLuint texture)
 	{
@@ -76,10 +78,18 @@ namespace Smile
 
 		_fbo.Init(_w, _h);
 
-		glGenBuffers(1, &_pbo);
-		glBindBuffer(GL_PIXEL_PACK_BUFFER, _pbo);
+		glGenBuffers(2, _pbo);
+
+		glBindBuffer(GL_PIXEL_PACK_BUFFER, _pbo[0]);
 		glBufferData(GL_PIXEL_PACK_BUFFER, _w * _h * 4, 0, GL_STREAM_READ);
+
+		glBindBuffer(GL_PIXEL_PACK_BUFFER, _pbo[1]);
+		glBufferData(GL_PIXEL_PACK_BUFFER, _w * _h * 4, 0, GL_STREAM_READ);
+
 		glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
+
+		_DMA = 0;
+		_Read = 1;
 	}
 
 	void Smile::XRenderWindow::Render()
@@ -98,38 +108,19 @@ namespace Smile
 		DrawOnCPU(_texture);
 
 		//保存图片
-		glBindBuffer(GL_PIXEL_PACK_BUFFER, _pbo);
+		glBindBuffer(GL_PIXEL_PACK_BUFFER, _pbo[_DMA]);
 		glReadPixels(0, 0, _w, _h, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+
+		glBindBuffer(GL_PIXEL_PACK_BUFFER, _pbo[_Read]);
 		void* pData = glMapBuffer(GL_PIXEL_PACK_BUFFER, GL_READ_ONLY);
 		if (pData)
 		{
 			XResource::SaveTextureFile("D:/abc1.png", (char*)pData, _w, _h);
 		}
 		glUnmapBuffer(GL_PIXEL_PACK_BUFFER);
-		
+		std::swap(_DMA, _Read);
 
 		_fbo.End();
-
-		//清空
-		glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		//正交投影绘制平面
-		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
-		glOrtho(0, _w, 0, _h, -100, 100);
-
-		DrawOnCPU(_dynamic);
-
-		//保存图片
-		glBindBuffer(GL_PIXEL_PACK_BUFFER, _pbo);
-		glReadPixels(0, 0, _w, _h, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-		pData = glMapBuffer(GL_PIXEL_PACK_BUFFER, GL_READ_ONLY);
-		if (pData)
-		{
-			XResource::SaveTextureFile("D:/abc2.png", (char*)pData, _w, _h);
-		}
-		glUnmapBuffer(GL_PIXEL_PACK_BUFFER);
 	}
 
 	void Smile::XRenderWindow::End()
