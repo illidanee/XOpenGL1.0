@@ -90,6 +90,12 @@ namespace Smile
 
 		DrawOnCPU(_texture);
 
+		//±£´æÍ¼Æ¬
+		char* pBuffer = new char[_w * _h * 4];
+		memset(pBuffer, 0, _w * _h * 4);
+		glReadPixels(0, 0, _w, _h, GL_RGBA, GL_UNSIGNED_BYTE, pBuffer);
+		XResource::SaveTextureFile("D:/abc.png", pBuffer, _w, _h);
+
 		_fbo.End();
 
 		//Çå¿Õ
@@ -102,6 +108,12 @@ namespace Smile
 		glOrtho(0, _w, 0, _h, -100, 100);
 
 		DrawOnCPU(_dynamic);
+
+		//±£´æÍ¼Æ¬
+		char* pBuffer = new char[_w * _h * 4];
+		memset(pBuffer, 0, _w * _h * 4);
+		glReadPixels(0, 0, _w, _h, GL_RGBA, GL_UNSIGNED_BYTE, pBuffer);
+		XResource::SaveTextureFile("D:/abc.png", pBuffer, _w, _h);
 	}
 
 	void Smile::XRenderWindow::End()

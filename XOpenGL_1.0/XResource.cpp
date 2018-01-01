@@ -29,4 +29,19 @@ namespace Smile
 
 		return 1;
 	}
+
+	int XResource::SaveTextureFile(const char* pFile, char* pBuffer, int w, int h)
+	{
+		FIBITMAP* dib = FreeImage_Allocate(w, h, 32);
+
+		unsigned char* pPixel = FreeImage_GetBits(dib);
+
+		memcpy(pPixel, pBuffer, w * h * 4);
+
+		BOOL res = FreeImage_Save(FIF_PNG, dib, pFile, PNG_DEFAULT);
+
+		FreeImage_Unload(dib);
+
+		return res;
+	}
 }
