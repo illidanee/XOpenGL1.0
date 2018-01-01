@@ -21,11 +21,17 @@ namespace Smile
 	GLuint _texture;
 	GLuint _dynamic;
 
-	XGLFrameBufferObject _fbo;
-
 	GLuint _pbo[2];
 	int _DMA;
-	int _Read;
+	int _Write;
+	
+	void RandomBuffer(char* pData, int w, int h)
+	{
+		for (unsigned int i = 0; i < w * h * 4; ++i)
+		{
+			pData[i] = rand();
+		}
+	}
 
 	void DrawOnCPU(GLuint texture)
 	{
@@ -76,26 +82,22 @@ namespace Smile
 			glBindTexture(GL_TEXTURE_2D, 0);
 		}
 
-		_fbo.Init(_w, _h);
-
 		glGenBuffers(2, _pbo);
 
-		glBindBuffer(GL_PIXEL_PACK_BUFFER, _pbo[0]);
-		glBufferData(GL_PIXEL_PACK_BUFFER, _w * _h * 4, 0, GL_STREAM_READ);
+		glBindBuffer(GL_PIXEL_UNPACK_BUFFER, _pbo[0]);
+		glBufferData(GL_PIXEL_UNPACK_BUFFER, _w * _h * 4, 0, GL_STREAM_READ);
 
-		glBindBuffer(GL_PIXEL_PACK_BUFFER, _pbo[1]);
-		glBufferData(GL_PIXEL_PACK_BUFFER, _w * _h * 4, 0, GL_STREAM_READ);
+		glBindBuffer(GL_PIXEL_UNPACK_BUFFER, _pbo[1]);
+		glBufferData(GL_PIXEL_UNPACK_BUFFER, _w * _h * 4, 0, GL_STREAM_READ);
 
-		glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
+		glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 
 		_DMA = 0;
-		_Read = 1;
+		_Write = 1;
 	}
 
 	void Smile::XRenderWindow::Render()
 	{
-		_fbo.Begin(_dynamic);
-
 		//Çå¿Õ
 		glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -105,30 +107,27 @@ namespace Smile
 		glLoadIdentity();
 		glOrtho(0, _w, 0, _h, -100, 100);
 
-		DrawOnCPU(_texture);
-
 		//±£´æÍ¼Æ¬
-		glBindBuffer(GL_PIXEL_PACK_BUFFER, _pbo[_DMA]);
-		glReadPixels(0, 0, _w, _h, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+		glBindTexture(GL_TEXTURE_2D, _dynamic);
+		glBindBuffer(GL_PIXEL_UNPACK_BUFFER, _pbo[_DMA]);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, _w, _h, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 
-		glBindBuffer(GL_PIXEL_PACK_BUFFER, _pbo[_Read]);
-		void* pData = glMapBuffer(GL_PIXEL_PACK_BUFFER, GL_READ_ONLY);
+		glBindBuffer(GL_PIXEL_UNPACK_BUFFER, _pbo[_Write]);
+		void* pData = glMapBuffer(GL_PIXEL_UNPACK_BUFFER, GL_READ_ONLY);
 		if (pData)
 		{
-			XResource::SaveTextureFile("D:/abc1.png", (char*)pData, _w, _h);
+			RandomBuffer((char*)pData, _w, _h);
 		}
-		glUnmapBuffer(GL_PIXEL_PACK_BUFFER);
-		std::swap(_DMA, _Read);
+		glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER);
+		std::swap(_DMA, _Write);
 
-		_fbo.End();
+		DrawOnCPU(_dynamic);
 	}
 
 	void Smile::XRenderWindow::End()
 	{
 		glDeleteTextures(1, &_texture);
 		glDeleteTextures(1, &_dynamic);
-
-		_fbo.Destroy();
 	}
 }
 
