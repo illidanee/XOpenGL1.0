@@ -582,6 +582,7 @@ namespace Smile
 		T s = sinf(ANGLE2RADIAN(angle));
 
 		_XVector3<T> res;
+		res._x = vector._x;
 		res._y = vector._y * c - vector._z * s;
 		res._z = vector._y * s + vector._z * c;
 
@@ -596,6 +597,7 @@ namespace Smile
 
 		_XVector3<T> res;
 		res._x = vector._x * c + vector._z * s;
+		res._y = vector._y;
 		res._z = -vector._x * s + vector._z * c;
 
 		return res;
@@ -610,6 +612,7 @@ namespace Smile
 		_XVector3<T> res;
 		res._x = vector._x * c - vector._y * s;
 		res._y = vector._x * s + vector._y * c;
+		res._z = vector._z;
 
 		return res;
 	}

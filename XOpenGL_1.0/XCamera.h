@@ -24,6 +24,7 @@ namespace Smile
 		void OnFront();
 		void OnBack();
 
+		void OnRotateX(float delta);
 		void OnRotateY(float delta);
 
 	private:

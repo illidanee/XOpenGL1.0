@@ -53,6 +53,14 @@ namespace Smile
 		_aim = _aim - _dir * _speed;
 	}
 
+	void XCamera::OnRotateX(float delta)
+	{
+		_dir = Normalize(RotateX(_dir, delta));
+		float len = Length(_aim - _pos);
+		_aim = _pos + _dir * len;
+
+	}
+
 	void XCamera::OnRotateY(float delta)
 	{
 		_dir = Normalize(RotateY(_dir, delta));

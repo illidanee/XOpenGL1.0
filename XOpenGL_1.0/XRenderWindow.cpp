@@ -120,37 +120,34 @@ namespace Smile
 				int x = GET_X_LPARAM(lParam);
 				int y = GET_Y_LPARAM(lParam);
 				int offsetX = x - _x;
-				_camera.OnRotateY(offsetX * 0.001f);
+				int offsetY = y - _y;
+				_camera.OnRotateX(offsetY * 0.1f);
+				_camera.OnRotateY(-offsetX * 0.1f);
 				_x = x;
-
-				XVec3f temp(1, 0, 0);
-
-				XVec3f t1 = RotateY(temp, 90.0f);
-				int a = 1;
-				a = 2;
+				_y = y;
 			}
 		}
 		break;
-		case WM_KEYDOWN:
+		case WM_CHAR:
 		{
 			switch (wParam)
 			{
-			case VK_UP:
+			case 'W':
 			{
 				_camera.OnFront();
 			}
 			break;
-			case VK_DOWN:
+			case 'S':
 			{
 				_camera.OnBack();
 			}
 			break;
-			case VK_LEFT:
+			case 'A':
 			{
 				_camera.OnLeft();
 			}
 			break;
-			case VK_RIGHT:
+			case 'D':
 			{
 				_camera.OnRight();
 			}
