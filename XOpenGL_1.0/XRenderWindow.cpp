@@ -1,5 +1,8 @@
 #include "XRenderWindow.h"
 
+#include "XCamera.h"
+
+
 namespace Smile
 {
 	struct Vertex
@@ -54,6 +57,8 @@ namespace Smile
 	GLuint _texture1;
 	GLuint _texture2;
 
+	XCamera _camera;
+
 	void DrawPlane(GLuint texture)
 	{
 		glBindTexture(GL_TEXTURE_2D, texture);
@@ -92,7 +97,71 @@ namespace Smile
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
-	void Smile::XRenderWindow::Begin()
+	void XRenderWindow::Event(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+	{
+		switch (uMsg)
+		{
+		case WM_RBUTTONDOWN:
+		{
+			_x = GET_X_LPARAM(lParam);
+			_y = GET_Y_LPARAM(lParam);
+			_RButtonDown = true;
+		}
+		break;
+		case WM_RBUTTONUP:
+		{
+			_RButtonDown = false;
+		}
+		break;
+		case WM_MOUSEMOVE:
+		{
+			if (_RButtonDown)
+			{
+				int x = GET_X_LPARAM(lParam);
+				int y = GET_Y_LPARAM(lParam);
+				int offsetX = x - _x;
+				_camera.OnRotateY(offsetX * 0.001f);
+				_x = x;
+
+				XVec3f temp(1, 0, 0);
+
+				XVec3f t1 = RotateY(temp, 90.0f);
+				int a = 1;
+				a = 2;
+			}
+		}
+		break;
+		case WM_KEYDOWN:
+		{
+			switch (wParam)
+			{
+			case VK_UP:
+			{
+				_camera.OnFront();
+			}
+			break;
+			case VK_DOWN:
+			{
+				_camera.OnBack();
+			}
+			break;
+			case VK_LEFT:
+			{
+				_camera.OnLeft();
+			}
+			break;
+			case VK_RIGHT:
+			{
+				_camera.OnRight();
+			}
+			break;
+			}
+		}
+		break;
+		}
+	}
+
+	void XRenderWindow::Begin()
 	{
 		char* pBuffer;
 		int w, h;
@@ -117,9 +186,14 @@ namespace Smile
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, pBuffer);
 			glBindTexture(GL_TEXTURE_2D, 0);
 		}
+
+		_camera.Init(XVec3f(0.0f, 10.0f, 10.0f), XVec3f(0.0f, 0.0f, 0.0f),XVec3f(0.0f, 1.0f, 0.0f));
+		_RButtonDown = false;
+		_x = 0;
+		_y = 0;
 	}
 
-	void Smile::XRenderWindow::Render()
+	void XRenderWindow::Render()
 	{
 		//Çå¿Õ
 		glClearColor(0.16f, 0.26f, 0.36f, 1.0f);
@@ -133,7 +207,7 @@ namespace Smile
 
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
-		gluLookAt(0.0f, 10.0f, 10.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
+		_camera.Update();
 
 		DrawPlane(_texture1);
 
@@ -141,9 +215,10 @@ namespace Smile
 		DrawCube(_texture2);
 	}
 
-	void Smile::XRenderWindow::End()
+	void XRenderWindow::End()
 	{
 		glDeleteTextures(1, &_texture1);
+		glDeleteTextures(1, &_texture2);
 	}
 }
 
