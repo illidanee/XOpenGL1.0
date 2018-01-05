@@ -1,7 +1,5 @@
 #include "XRenderWindow.h"
 
-#include "XGLFrameBufferObject.h"
-
 namespace Smile
 {
 	struct Vertex
@@ -10,33 +8,83 @@ namespace Smile
 		float u, v;
 	};
 
-	Vertex g_cubeVertices[] =
+	const float size = 20.0f;
+
+	Vertex g_PlaneVertices[] =
 	{
-		{ 200,150,0.0f,	0.0f,0.0f},
-		{ 600,150,0.0f, 1.0f,0.0f},
-		{ 600,450,0.0f, 1.0f,1.0f},
-		{ 200,450,0.0f,	0.0f,1.0f}
+		{ -size / 2.0f,  0.0f,  size / 2.0f,     0.0f,  0.0f },
+		{ -size / 2.0f,  0.0f, -size / 2.0f,     0.0f,  size },
+		{  size / 2.0f,  0.0f,  size / 2.0f,     size,  0.0f },
+		{  size / 2.0f,  0.0f, -size / 2.0f,     size,  size },
 	};
 
-	GLuint _texture;
-	GLuint _dynamic;
-
-	void DrawOnCPU(GLuint texture)
+	Vertex g_CubeVertices[] =
 	{
-		//模型矩阵
-		glMatrixMode(GL_MODELVIEW);
-		glLoadIdentity();
+		{ -1.0f,-1.0f, 1.0f,	0,  0 },
+		{  1.0f,-1.0f, 1.0f,	1,  0 },
+		{  1.0f, 1.0f, 1.0f,	1,  1 },
+		{ -1.0f, 1.0f, 1.0f,	0,  1 },
 
+		{ -1.0f,-1.0f,-1.0f,	0,  0 },
+		{ -1.0f, 1.0f,-1.0f,	1,  0 },
+		{  1.0f, 1.0f,-1.0f,	1,  1 },
+		{  1.0f,-1.0f,-1.0f,	0,  1 },
+
+		{ -1.0f, 1.0f,-1.0f,	0,  0 },
+		{ -1.0f, 1.0f, 1.0f,	1,  0 },
+		{  1.0f, 1.0f, 1.0f,	1,  1 },
+		{  1.0f, 1.0f,-1.0f,	0,  1 },
+
+		{ -1.0f,-1.0f,-1.0f,	0,  0 },
+		{  1.0f,-1.0f,-1.0f,	1,  0 },
+		{  1.0f,-1.0f, 1.0f,	1,  1 },
+		{ -1.0f,-1.0f, 1.0f,	0,  1 },
+
+		{  1.0f,-1.0f,-1.0f,	0,  0 },
+		{  1.0f, 1.0f,-1.0f,	1,  0 },
+		{  1.0f, 1.0f, 1.0f,	1,  1 },
+		{  1.0f,-1.0f, 1.0f,	0,  1 },
+
+		{ -1.0f,-1.0f,-1.0f,	0,  0 },
+		{ -1.0f,-1.0f, 1.0f,	1,  0 },
+		{ -1.0f, 1.0f, 1.0f,	1,  1 },
+		{ -1.0f, 1.0f,-1.0f,	0,  1 },
+	};
+
+	GLuint _texture1;
+	GLuint _texture2;
+
+	void DrawPlane(GLuint texture)
+	{
 		glBindTexture(GL_TEXTURE_2D, texture);
 
 		//绑定数据
 		glEnableClientState(GL_VERTEX_ARRAY);
-		glVertexPointer(3, GL_FLOAT, sizeof(Vertex), &g_cubeVertices[0].x);
+		glVertexPointer(3, GL_FLOAT, sizeof(Vertex), &g_PlaneVertices[0].x);
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-		glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), &g_cubeVertices[0].u);
+		glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), &g_PlaneVertices[0].u);
 
 		//绘制
-		glDrawArrays(GL_QUADS, 0, 4);
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+		glDisableClientState(GL_VERTEX_ARRAY);
+		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+
+	void DrawCube(GLuint texture)
+	{
+		glBindTexture(GL_TEXTURE_2D, texture);
+
+		//绑定数据
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glVertexPointer(3, GL_FLOAT, sizeof(Vertex), &g_CubeVertices[0].x);
+		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+		glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), &g_CubeVertices[0].u);
+
+		//绘制
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 24);
 
 		glDisableClientState(GL_VERTEX_ARRAY);
 		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -50,23 +98,23 @@ namespace Smile
 		int w, h;
 
 		glEnable(GL_TEXTURE_2D);
-		XResource::LoadTextureFile("../Resources/1.jpg", &pBuffer, &w, &h);
+		XResource::LoadTextureFile("../Resources/grass.png", &pBuffer, &w, &h);
 		{
-			glGenTextures(1, &_texture);
-			glBindTexture(GL_TEXTURE_2D, _texture);
+			glGenTextures(1, &_texture1);
+			glBindTexture(GL_TEXTURE_2D, _texture1);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, pBuffer);
 			glBindTexture(GL_TEXTURE_2D, 0);
 		}
 
-		glEnable(GL_TEXTURE_2D);
+		XResource::LoadTextureFile("../Resources/1.jpg", &pBuffer, &w, &h);
 		{
-			glGenTextures(1, &_dynamic);
-			glBindTexture(GL_TEXTURE_2D, _dynamic);
+			glGenTextures(1, &_texture2);
+			glBindTexture(GL_TEXTURE_2D, _texture2);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _w, _h, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, pBuffer);
 			glBindTexture(GL_TEXTURE_2D, 0);
 		}
 	}
@@ -74,29 +122,28 @@ namespace Smile
 	void Smile::XRenderWindow::Render()
 	{
 		//清空
-		glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+		glClearColor(0.16f, 0.26f, 0.36f, 1.0f);
+		glEnable(GL_DEPTH_TEST);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		//正交投影绘制平面
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
-		glOrtho(0, _w, 0, _h, -100, 100);
+		gluPerspective(60.0f, (float)_w / _h, 0.01f, 1000.0f);
 
-		DrawOnCPU(_texture);
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
+		gluLookAt(0.0f, 10.0f, 10.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
 
-		glBindTexture(GL_TEXTURE_2D, _dynamic);
-		glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, _w, _h);
-		glBindTexture(GL_TEXTURE_2D, 0);
+		DrawPlane(_texture1);
 
-		glClearColor(1.0f, 1.0f, 0.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		DrawOnCPU(_dynamic);
+		glTranslatef(0.0f, 2.0f, 0.0f);
+		DrawCube(_texture2);
 	}
 
 	void Smile::XRenderWindow::End()
 	{
-		glDeleteTextures(1, &_texture);
-		glDeleteTextures(1, &_dynamic);
+		glDeleteTextures(1, &_texture1);
 	}
 }
 
