@@ -1,6 +1,6 @@
 #include "XRenderWindow.h"
 
-#include "XCamera.h"
+#include "XCamera3rd.h"
 
 
 namespace Smile
@@ -24,40 +24,42 @@ namespace Smile
 	Vertex g_CubeVertices[] =
 	{
 		{ -1.0f,-1.0f, 1.0f,	0,  0 },
+		{ -1.0f, 1.0f, 1.0f,	0,  1 },
 		{  1.0f,-1.0f, 1.0f,	1,  0 },
 		{  1.0f, 1.0f, 1.0f,	1,  1 },
-		{ -1.0f, 1.0f, 1.0f,	0,  1 },
-
-		{ -1.0f,-1.0f,-1.0f,	0,  0 },
-		{ -1.0f, 1.0f,-1.0f,	1,  0 },
-		{  1.0f, 1.0f,-1.0f,	1,  1 },
-		{  1.0f,-1.0f,-1.0f,	0,  1 },
-
-		{ -1.0f, 1.0f,-1.0f,	0,  0 },
-		{ -1.0f, 1.0f, 1.0f,	1,  0 },
-		{  1.0f, 1.0f, 1.0f,	1,  1 },
-		{  1.0f, 1.0f,-1.0f,	0,  1 },
-
-		{ -1.0f,-1.0f,-1.0f,	0,  0 },
-		{  1.0f,-1.0f,-1.0f,	1,  0 },
-		{  1.0f,-1.0f, 1.0f,	1,  1 },
-		{ -1.0f,-1.0f, 1.0f,	0,  1 },
 
 		{  1.0f,-1.0f,-1.0f,	0,  0 },
-		{  1.0f, 1.0f,-1.0f,	1,  0 },
-		{  1.0f, 1.0f, 1.0f,	1,  1 },
-		{  1.0f,-1.0f, 1.0f,	0,  1 },
+		{  1.0f, 1.0f,-1.0f,	0,  1 },
+		{ -1.0f,-1.0f,-1.0f,	1,  0 },
+		{ -1.0f, 1.0f,-1.0f,	1,  1 },
+
+		{ -1.0f, 1.0f, 1.0f,	0,  0 },
+		{ -1.0f, 1.0f,-1.0f,	0,  1 },
+		{  1.0f, 1.0f, 1.0f,	1,  0 },
+		{  1.0f, 1.0f,-1.0f,	1,  1 },
 
 		{ -1.0f,-1.0f,-1.0f,	0,  0 },
-		{ -1.0f,-1.0f, 1.0f,	1,  0 },
-		{ -1.0f, 1.0f, 1.0f,	1,  1 },
-		{ -1.0f, 1.0f,-1.0f,	0,  1 },
+		{ -1.0f,-1.0f, 1.0f,	0,  1 },
+		{  1.0f,-1.0f,-1.0f,	1,  0 },
+		{  1.0f,-1.0f, 1.0f,	1,  1 },
+		
+		{  1.0f,-1.0f, 1.0f,	0,  0 },
+		{  1.0f, 1.0f, 1.0f,	0,  1 },
+		{  1.0f,-1.0f, -1.0f,	1,  0 },
+		{  1.0f, 1.0f, -1.0f,	1,  1 },
+
+		{ -1.0f,-1.0f, 1.0f,	0,  0 },
+		{ -1.0f, 1.0f, 1.0f,	0,  1 },
+		{ -1.0f,-1.0f, -1.0f,	1,  0 },
+		{ -1.0f, 1.0f, -1.0f,	1,  1 },
+
 	};
 
 	GLuint _texture1;
 	GLuint _texture2;
 
-	XCamera _camera;
+	XCamera3rd _camera;
+	XVec3f _rolePos;
 
 	void DrawPlane(GLuint texture)
 	{
@@ -128,28 +130,41 @@ namespace Smile
 			}
 		}
 		break;
+		case WM_MOUSEWHEEL:
+		{
+			short zDelta = GET_WHEEL_DELTA_WPARAM(wParam);
+			if (zDelta > 0)
+				_camera.OnScaleLength(1.2f);
+			else
+				_camera.OnScaleLength(0.8f);
+		}
+		break;
 		case WM_CHAR:
 		{
 			switch (wParam)
 			{
 			case 'W':
 			{
-				_camera.OnFront();
+				//_camera.OnFront();
+				_rolePos._x += 1.0f;
 			}
 			break;
 			case 'S':
 			{
-				_camera.OnBack();
+				//_camera.OnBack();
+				_rolePos._x -= 1.0f;
 			}
 			break;
 			case 'A':
 			{
-				_camera.OnLeft();
+				//_camera.OnLeft();
+				_rolePos._z -= 1.0f;
 			}
 			break;
 			case 'D':
 			{
-				_camera.OnRight();
+				//_camera.OnRight();
+				_rolePos._z += 1.0f;
 			}
 			break;
 			}
@@ -185,9 +200,16 @@ namespace Smile
 		}
 
 		_camera.Init(XVec3f(0.0f, 10.0f, 10.0f), XVec3f(0.0f, 0.0f, 0.0f),XVec3f(0.0f, 1.0f, 0.0f));
+		_rolePos._x = 0;
+		_rolePos._y = 2.0f;
+		_rolePos._z = 0;
+		_camera.LookAt(_rolePos);
+
 		_RButtonDown = false;
 		_x = 0;
 		_y = 0;
+
+
 	}
 
 	void XRenderWindow::Render()
@@ -204,12 +226,15 @@ namespace Smile
 
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
+		_camera.LookAt(_rolePos);
 		_camera.Update();
 
-		DrawPlane(_texture1);
-
-		glTranslatef(0.0f, 2.0f, 0.0f);
+		glPushMatrix();
+		glTranslatef(_rolePos._x, _rolePos._y, _rolePos._z);
 		DrawCube(_texture2);
+		glPopMatrix();
+
+		DrawPlane(_texture1);
 	}
 
 	void XRenderWindow::End()

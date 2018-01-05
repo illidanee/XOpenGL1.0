@@ -157,6 +157,7 @@
     <ClCompile Include="glew.c" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="XCamera.cpp" />
+    <ClCompile Include="XCamera3rd.cpp" />
     <ClCompile Include="XGLContent.cpp" />
     <ClCompile Include="XGLFrameBufferObject.cpp" />
     <ClCompile Include="XGLPBuffer.cpp" />
@@ -169,6 +170,7 @@
   <ItemGroup>
     <ClInclude Include="CommonType.h" />
     <ClInclude Include="XCamera.h" />
+    <ClInclude Include="XCamera3rd.h" />
     <ClInclude Include="XGLContent.h" />
     <ClInclude Include="XGLFrameBufferObject.h" />
     <ClInclude Include="XGLPBuffer.h" />
