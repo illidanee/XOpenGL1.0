@@ -17,7 +17,8 @@ namespace Smile
 
 		void Init(XVec3f pos, XVec3f aim, XVec3f up);
 
-		void Update();
+		void View();
+		void Proj(float fovy, float aspect, float zNear, float zFar);
 
 		void OnLeft();
 		void OnRight();
@@ -36,5 +37,11 @@ namespace Smile
 		XVec3f _right;
 
 		float _speed;
+
+		XMat4f _matView;
+		XMat4f _matProj;
+
+	public:
+		XMat4f GetMatPV() { return _matProj * _matView; }
 	};
 }

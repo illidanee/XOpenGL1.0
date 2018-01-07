@@ -24,9 +24,14 @@ namespace Smile
 		_speed = 0.1f;
 	}
 
-	void XCamera::Update()
+	void XCamera::View()
 	{
-		gluLookAt(_pos._x, _pos._y, _pos._z, _aim._x, _aim._y, _aim._z, _up._x, _up._y, _up._z);
+		_matView = LookAt(_pos, _aim, _up);
+	}
+
+	void XCamera::Proj(float fovy, float aspect, float zNear, float zFar)
+	{
+		_matProj = Perspective(fovy, aspect, zNear, zFar);
 	}
 
 	void XCamera::OnLeft()
@@ -55,7 +60,12 @@ namespace Smile
 
 	void XCamera::OnRotateX(float delta)
 	{
-		_dir = Normalize(RotateX(_dir, delta));
+		XMat4f rotMat;
+		rotMat.Rotate(delta, _right);
+		XVec4f tempDir = XVec4f(_dir._x, _dir._y, _dir._z, 1.0f);
+		tempDir = rotMat * tempDir;
+		_dir = XVec3f(tempDir._x, tempDir._y, tempDir._z);
+
 		float len = Length(_aim - _pos);
 		_aim = _pos + _dir * len;
 
@@ -63,7 +73,12 @@ namespace Smile
 
 	void XCamera::OnRotateY(float delta)
 	{
-		_dir = Normalize(RotateY(_dir, delta));
+		XMat4f rotMat;
+		rotMat.Rotate(delta, _up);
+		XVec4f tempDir = XVec4f(_dir._x, _dir._y, _dir._z, 1.0f);
+		tempDir = rotMat * tempDir;
+		_dir = XVec3f(tempDir._x, tempDir._y, tempDir._z);
+
 		float len = Length(_aim - _pos);
 		_aim = _pos + _dir * len;
 

@@ -1,6 +1,6 @@
 #include "XRenderWindow.h"
 
-#include "XCamera3rd.h"
+#include "XCamera.h"
 
 
 namespace Smile
@@ -58,8 +58,8 @@ namespace Smile
 	GLuint _texture1;
 	GLuint _texture2;
 
-	XCamera3rd _camera3rd;
-	XVec3f _rolePos;
+	XCamera _camera;
+	//XVec3f _rolePos;
 
 	void DrawPlane(GLuint texture)
 	{
@@ -124,8 +124,8 @@ namespace Smile
 				int offsetX = x - _x;
 				int offsetY = y - _y;
 				
-				_camera3rd.OnRotateX(offsetY * 0.1f);
-				_camera3rd.OnRotateY(offsetX * 0.1f);
+				_camera.OnRotateX(offsetY * 0.1f);
+				_camera.OnRotateY(offsetX * 0.1f);
 				
 				_x = x;
 				_y = y;
@@ -134,11 +134,11 @@ namespace Smile
 		break;
 		case WM_MOUSEWHEEL:
 		{
-			short zDelta = GET_WHEEL_DELTA_WPARAM(wParam);
-			if (zDelta > 0)
-				_camera3rd.OnScaleLength(1.2f);
-			else
-				_camera3rd.OnScaleLength(0.8f);
+			//short zDelta = GET_WHEEL_DELTA_WPARAM(wParam);
+			//if (zDelta > 0)
+			//	_camera.OnScaleLength(1.2f);
+			//else
+			//	_camera.OnScaleLength(0.8f);
 		}
 		break;
 		case WM_CHAR:
@@ -147,26 +147,26 @@ namespace Smile
 			{
 			case 'W':
 			{
-				//_camera.OnFront();
-				_rolePos._x += 1.0f;
+				_camera.OnFront();
+				//_rolePos._x += 1.0f;
 			}
 			break;
 			case 'S':
 			{
-				//_camera.OnBack();
-				_rolePos._x -= 1.0f;
+				_camera.OnBack();
+				//_rolePos._x -= 1.0f;
 			}
 			break;
 			case 'A':
 			{
-				//_camera.OnLeft();
-				_rolePos._z -= 1.0f;
+				_camera.OnLeft();
+				//_rolePos._z -= 1.0f;
 			}
 			break;
 			case 'D':
 			{
-				//_camera.OnRight();
-				_rolePos._z += 1.0f;
+				_camera.OnRight();
+				//_rolePos._z += 1.0f;
 			}
 			break;
 			}
@@ -201,10 +201,10 @@ namespace Smile
 			glBindTexture(GL_TEXTURE_2D, 0);
 		}
 
-		_camera3rd.Init(XVec3f(-10.0f, 10.0f, 10.0f), XVec3f(0.0f, 0.0f, 0.0f),XVec3f(0.0f, 1.0f, 0.0f));
-		_rolePos._x = 0;
-		_rolePos._y = 2.0f;
-		_rolePos._z = 0;
+		_camera.Init(XVec3f(-10.0f, 10.0f, 10.0f), XVec3f(0.0f, 0.0f, 0.0f),XVec3f(0.0f, 1.0f, 0.0f));
+		//_rolePos._x = 0;
+		//_rolePos._y = 2.0f;
+		//_rolePos._z = 0;
 
 		_RButtonDown = false;
 		_x = 0;
@@ -223,15 +223,14 @@ namespace Smile
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
 
-		_camera3rd.LookAtAim(_rolePos);
-		_camera3rd.View();
-		_camera3rd.Proj(60.0f, (float)_w / _h, 0.01f, 1000.0f);
+		_camera.View();
+		_camera.Proj(60.0f, (float)_w / _h, 0.01f, 1000.0f);
 
-		XMat4f _mat = _camera3rd.GetMatPV();
+		XMat4f _mat = _camera.GetMatPV();
 
 		glLoadMatrixf(_mat.GetData());
 
-		glTranslatef(_rolePos._x, _rolePos._y, _rolePos._z);
+		glTranslatef(0.0f, 2.0f, 0.0f);
 		DrawCube(_texture2);
 
 		glLoadMatrixf(_mat.GetData());
