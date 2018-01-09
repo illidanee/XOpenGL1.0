@@ -171,6 +171,7 @@
     <ClInclude Include="CommonType.h" />
     <ClInclude Include="XCamera.h" />
     <ClInclude Include="XCamera3rd.h" />
+    <ClInclude Include="XFrustum.h" />
     <ClInclude Include="XGLContent.h" />
     <ClInclude Include="XGLFrameBufferObject.h" />
     <ClInclude Include="XGLPBuffer.h" />

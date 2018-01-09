@@ -1,7 +1,7 @@
 #include "XRenderWindow.h"
 
 #include "XCamera3rd.h"
-
+#include "XFrustum.h"
 
 namespace Smile
 {
@@ -60,6 +60,8 @@ namespace Smile
 
 	XCamera3rd _camera;
 	XVec3f _rolePos;
+	XFrustumf _frustum;
+
 
 	/****************************************************************************************************************
 	 *
@@ -308,13 +310,25 @@ namespace Smile
 
 		XMat4f _mat = _camera.GetMatPV();
 
+		_frustum.Init(_mat);
+
 		glLoadMatrixf(_mat.GetData());
 
 		g_pPlane->Render();
+
+		int count = 0;
 		for (int i = 0; i < g_Size; ++i)
 		{
-			g_pNodes[i].Render();
+			if (_frustum.PointInFrustum(g_pNodes[i]._pos))
+			{
+				++count;
+				g_pNodes[i].Render();
+			}
 		}
+
+		char title[32];
+		sprintf(title, "%d", count);
+		SetWindowTextA(_hWnd, title);
 	}
 
 	void XRenderWindow::End()
