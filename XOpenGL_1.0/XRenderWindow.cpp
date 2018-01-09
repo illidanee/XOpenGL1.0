@@ -11,14 +11,14 @@ namespace Smile
 		float u, v;
 	};
 
-	const float size = 20.0f;
+	const float size = 100.0f;
 
 	Vertex g_PlaneVertices[] =
 	{
-		{ -size / 2.0f,  0.0f,  size / 2.0f,     0.0f,  0.0f },
-		{ -size / 2.0f,  0.0f, -size / 2.0f,     0.0f,  size },
-		{  size / 2.0f,  0.0f,  size / 2.0f,     size,  0.0f },
-		{  size / 2.0f,  0.0f, -size / 2.0f,     size,  size },
+		{ -size,  0.0f,  size,     0.0f,  0.0f },
+		{ -size,  0.0f, -size,     0.0f,  size },
+		{  size,  0.0f,  size,     size,  0.0f },
+		{  size,  0.0f, -size,     size,  size },
 	};
 
 	Vertex g_CubeVertices[] =
@@ -61,43 +61,81 @@ namespace Smile
 	XCamera3rd _camera;
 	XVec3f _rolePos;
 
-	void DrawPlane(GLuint texture)
+	/****************************************************************************************************************
+	 *
+	 *    Brief   : 抽象可绘制对象。
+	 *
+	 ****************************************************************************************************************/
+	class XRenderable
 	{
-		glBindTexture(GL_TEXTURE_2D, texture);
+		GLuint _Texture;
+		Vertex* _Vertices;
+		int _Len;
 
-		//绑定数据
-		glEnableClientState(GL_VERTEX_ARRAY);
-		glVertexPointer(3, GL_FLOAT, sizeof(Vertex), &g_PlaneVertices[0].x);
-		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-		glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), &g_PlaneVertices[0].u);
+	public:
+		void Init(GLuint texture, Vertex* vertices, int len)
+		{
+			_Texture = texture;
+			_Vertices = vertices;
+			_Len = len;
+		}
 
-		//绘制
-		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		void Render()
+		{
+			glBindTexture(GL_TEXTURE_2D, _Texture);
 
-		glDisableClientState(GL_VERTEX_ARRAY);
-		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+			//绑定数据
+			glEnableClientState(GL_VERTEX_ARRAY);
+			glVertexPointer(3, GL_FLOAT, sizeof(Vertex), &_Vertices[0].x);
+			glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+			glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), &_Vertices[0].u);
 
-		glBindTexture(GL_TEXTURE_2D, 0);
-	}
+			//绘制
+			glDrawArrays(GL_TRIANGLE_STRIP, 0, _Len);
 
-	void DrawCube(GLuint texture)
+			glDisableClientState(GL_VERTEX_ARRAY);
+			glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+
+			glBindTexture(GL_TEXTURE_2D, 0);
+		}
+	};
+
+	/****************************************************************************************************************
+	 *
+	 *    Brief   : 抽象节点对象。
+	 *
+	 ****************************************************************************************************************/
+	class XNode
 	{
-		glBindTexture(GL_TEXTURE_2D, texture);
+	public:
+		XVec3f _pos;
+		XRenderable* _pRenderable;
 
-		//绑定数据
-		glEnableClientState(GL_VERTEX_ARRAY);
-		glVertexPointer(3, GL_FLOAT, sizeof(Vertex), &g_CubeVertices[0].x);
-		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-		glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), &g_CubeVertices[0].u);
+		void Render()
+		{
+			if (_pRenderable)
+			{
+				glPushMatrix();
 
-		//绘制
-		glDrawArrays(GL_TRIANGLE_STRIP, 0, 24);
+				glTranslatef(_pos._x, _pos._y, _pos._z);
 
-		glDisableClientState(GL_VERTEX_ARRAY);
-		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+				_pRenderable->Render();
 
-		glBindTexture(GL_TEXTURE_2D, 0);
-	}
+				glPopMatrix();
+			}
+		}
+	};
+
+	/****************************************************************************************************************
+	 *
+	 *    Brief   : 定义绘制对象和节点
+	 *
+	 ****************************************************************************************************************/
+	XRenderable g_Plane;
+	XRenderable g_Cube;
+	const int g_Size = 100;
+	XNode* g_pPlane;
+	XNode* g_pNodes;
 
 	void XRenderWindow::Event(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
@@ -234,6 +272,22 @@ namespace Smile
 		_RButtonDown = false;
 		_x = 0;
 		_y = 0;
+
+		g_Plane.Init(_texture1, g_PlaneVertices, 4);
+		g_Cube.Init(_texture2, g_CubeVertices, 24);
+		
+		g_pPlane = new XNode;
+		g_pPlane->_pos = XVec3f(0.0f, 0.0f, 0.0f);
+		g_pPlane->_pRenderable = &g_Plane;
+
+		g_pNodes = new XNode[g_Size];
+		for (int i = 0; i < g_Size; ++i)
+		{
+			g_pNodes[i]._pos._x = rand() % 200 - 100;
+			g_pNodes[i]._pos._y = rand() % 20;
+			g_pNodes[i]._pos._z = rand() % 200 - 100;
+			g_pNodes[i]._pRenderable = &g_Cube;
+		}
 	}
 
 	void XRenderWindow::Render()
@@ -256,13 +310,11 @@ namespace Smile
 
 		glLoadMatrixf(_mat.GetData());
 
-		glTranslatef(_rolePos._x, _rolePos._y, _rolePos._z);
-		glScalef(0.1f, 0.1f, 0.1f);
-		DrawCube(_texture2);
-
-		glLoadMatrixf(_mat.GetData());
-
-		DrawPlane(_texture1);
+		g_pPlane->Render();
+		for (int i = 0; i < g_Size; ++i)
+		{
+			g_pNodes[i].Render();
+		}
 	}
 
 	void XRenderWindow::End()
