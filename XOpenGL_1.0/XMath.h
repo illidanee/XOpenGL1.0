@@ -1,6 +1,12 @@
 #pragma once
 
-#include <math.h>
+/****************************************************************************************************************
+ *
+ *    Brief   : 使用match.h头文件时，abs函数只有int版本。
+ *				只有使用cmath时支持函数重载才有float版本abs。
+ *
+ ****************************************************************************************************************/
+#include <cmath>
 
 namespace Smile
 {
@@ -437,57 +443,59 @@ namespace Smile
 			};
 		}
 
-		//_XMatrix4<T> Inverse() const
-		//{
-		//	T subFactor00 = _col[2][2] * _col[3][3] - _col[2][3] * _col[3][2];
-		//	T subFactor01 = _col[1][2] * _col[3][3] - _col[1][3] * _col[3][2];
-		//	T subFactor02 = _col[1][2] * _col[2][3] - _col[1][3] * _col[2][2];
-		//	T subFactor03 = _col[0][2] * _col[3][3] - _col[0][3] * _col[3][2];
-		//	T subFactor04 = _col[0][2] * _col[2][3] - _col[0][3] * _col[2][2];
-		//	T subFactor05 = _col[0][2] * _col[1][3] - _col[0][3] * _col[1][2];
-		//	T subFactor06 = _col[2][1] * _col[3][3] - _col[2][3] * _col[3][1];
-		//	T subFactor07 = _col[1][1] * _col[3][3] - _col[1][3] * _col[3][1];
-		//	T subFactor08 = _col[1][1] * _col[2][3] - _col[1][3] * _col[2][1];
-		//	T subFactor09 = _col[0][1] * _col[3][3] - _col[0][3] * _col[3][1];
-		//	T subFactor10 = _col[0][1] * _col[2][3] - _col[0][3] * _col[2][1];
-		//	T subFactor11 = _col[1][1] * _col[3][3] - _col[1][3] * _col[3][1];
-		//	T SubFactor12 = _col[0][1] * _col[1][3] - _col[0][3] * _col[1][1];
-		//	T subFactor13 = _col[2][1] * _col[3][2] - _col[2][2] * _col[3][1];
-		//	T subFactor14 = _col[1][1] * _col[3][2] - _col[1][2] * _col[3][1];
-		//	T subFactor15 = _col[1][1] * _col[2][2] - _col[1][2] * _col[2][1];
-		//	T subFactor16 = _col[0][1] * _col[3][2] - _col[0][2] * _col[3][1];
-		//	T subFactor17 = _col[0][1] * _col[2][2] - _col[0][2] * _col[2][1];
-		//	T subFactor18 = _col[0][1] * _col[1][2] - _col[0][2] * _col[1][1];
+		_XMatrix4<T> Inverse() const
+		{
+			T subFactor00 = this->_col[2][2] * this->_col[3][3] - this->_col[3][2] * this->_col[2][3];
+			T subFactor01 = this->_col[2][1] * this->_col[3][3] - this->_col[3][1] * this->_col[2][3];
+			T subFactor02 = this->_col[2][1] * this->_col[3][2] - this->_col[3][1] * this->_col[2][2];
+			T subFactor03 = this->_col[2][0] * this->_col[3][3] - this->_col[3][0] * this->_col[2][3];
+			T subFactor04 = this->_col[2][0] * this->_col[3][2] - this->_col[3][0] * this->_col[2][2];
+			T subFactor05 = this->_col[2][0] * this->_col[3][1] - this->_col[3][0] * this->_col[2][1];
+			T subFactor06 = this->_col[1][2] * this->_col[3][3] - this->_col[3][2] * this->_col[1][3];
+			T subFactor07 = this->_col[1][1] * this->_col[3][3] - this->_col[3][1] * this->_col[1][3];
+			T subFactor08 = this->_col[1][1] * this->_col[3][2] - this->_col[3][1] * this->_col[1][2];
+			T subFactor09 = this->_col[1][0] * this->_col[3][3] - this->_col[3][0] * this->_col[1][3];
+			T subFactor10 = this->_col[1][0] * this->_col[3][2] - this->_col[3][0] * this->_col[1][2];
+			T subFactor11 = this->_col[1][1] * this->_col[3][3] - this->_col[3][1] * this->_col[1][3];
+			T SubFactor12 = this->_col[1][0] * this->_col[3][1] - this->_col[3][0] * this->_col[1][1];
+			T subFactor13 = this->_col[1][2] * this->_col[2][3] - this->_col[2][2] * this->_col[1][3];
+			T subFactor14 = this->_col[1][1] * this->_col[2][3] - this->_col[2][1] * this->_col[1][3];
+			T subFactor15 = this->_col[1][1] * this->_col[2][2] - this->_col[2][1] * this->_col[1][2];
+			T subFactor16 = this->_col[1][0] * this->_col[2][3] - this->_col[2][0] * this->_col[1][3];
+			T subFactor17 = this->_col[1][0] * this->_col[2][2] - this->_col[2][0] * this->_col[1][2];
+			T subFactor18 = this->_col[1][0] * this->_col[2][1] - this->_col[2][0] * this->_col[1][1];
 
-		//	_XMatrix4<T> res
-		//	(
-		//		+_col[1][1] * subFactor00 - _col[2][1] * subFactor01 + _col[3][1] * subFactor02,
-		//		-_col[0][1] * subFactor00 + _col[2][1] * subFactor03 - _col[3][1] * subFactor04,
-		//		+_col[0][1] * subFactor01 - _col[1][1] * subFactor03 + _col[3][1] * subFactor05,
-		//		-_col[0][1] * subFactor02 + _col[1][1] * subFactor04 - _col[2][1] * subFactor05,
+			_XMatrix4<T> res(
+				+ this->_col[1][1] * subFactor00 - this->_col[1][2] * subFactor01 + this->_col[1][3] * subFactor02,
+				- this->_col[1][0] * subFactor00 + this->_col[1][2] * subFactor03 - this->_col[1][3] * subFactor04,
+				+ this->_col[1][0] * subFactor01 - this->_col[1][1] * subFactor03 + this->_col[1][3] * subFactor05,
+				- this->_col[1][0] * subFactor02 + this->_col[1][1] * subFactor04 - this->_col[1][2] * subFactor05,
+					   																	 
+				- this->_col[0][1] * subFactor00 + this->_col[0][2] * subFactor01 - this->_col[0][3] * subFactor02,
+				+ this->_col[0][0] * subFactor00 - this->_col[0][2] * subFactor03 + this->_col[0][3] * subFactor04,
+				- this->_col[0][0] * subFactor01 + this->_col[0][1] * subFactor03 - this->_col[0][3] * subFactor05,
+				+ this->_col[0][0] * subFactor02 - this->_col[0][1] * subFactor04 + this->_col[0][2] * subFactor05,
+					   																	 
+				+ this->_col[0][1] * subFactor06 - this->_col[0][2] * subFactor07 + this->_col[0][3] * subFactor08,
+				- this->_col[0][0] * subFactor06 + this->_col[0][2] * subFactor09 - this->_col[0][3] * subFactor10,
+				+ this->_col[0][0] * subFactor11 - this->_col[0][1] * subFactor09 + this->_col[0][3] * SubFactor12,
+				- this->_col[0][0] * subFactor08 + this->_col[0][1] * subFactor10 - this->_col[0][2] * SubFactor12,
+					   																	 
+				- this->_col[0][1] * subFactor13 + this->_col[0][2] * subFactor14 - this->_col[0][3] * subFactor15,
+				+ this->_col[0][0] * subFactor13 - this->_col[0][2] * subFactor16 + this->_col[0][3] * subFactor17,
+				- this->_col[0][0] * subFactor14 + this->_col[0][1] * subFactor16 - this->_col[0][3] * subFactor18,
+				+ this->_col[0][0] * subFactor15 - this->_col[0][1] * subFactor17 + this->_col[0][2] * subFactor18
+			);
 
-		//		-_col[1][0] * subFactor00 + _col[2][0] * subFactor01 - _col[3][0] * subFactor02,
-		//		+_col[0][0] * subFactor00 - _col[2][0] * subFactor03 + _col[3][0] * subFactor04,
-		//		-_col[0][0] * subFactor01 + _col[1][0] * subFactor03 - _col[3][0] * subFactor05,
-		//		+_col[0][0] * subFactor02 - _col[1][0] * subFactor04 + _col[2][0] * subFactor05,
+			T determinant =
+				+ this->_col[0][0] * res[0][0]
+				+ this->_col[0][1] * res[1][0]
+				+ this->_col[0][2] * res[2][0]
+				+ this->_col[0][3] * res[3][0];
 
-		//		+_col[1][0] * subFactor06 - _col[2][0] * subFactor07 + _col[3][0] * subFactor08,
-		//		-_col[0][0] * subFactor06 + _col[2][0] * subFactor09 - _col[3][0] * subFactor10,
-		//		+_col[0][0] * subFactor11 - _col[1][0] * subFactor09 + _col[3][0] * SubFactor12,
-		//		-_col[0][0] * subFactor08 + _col[1][0] * subFactor10 - _col[2][0] * SubFactor12,
-
-		//		-_col[1][0] * subFactor13 + _col[2][0] * subFactor14 - _col[3][0] * subFactor15,
-		//		+_col[0][0] * subFactor13 - _col[2][0] * subFactor16 + _col[3][0] * subFactor17,
-		//		-_col[0][0] * subFactor14 + _col[1][0] * subFactor16 - _col[3][0] * subFactor18,
-		//		+_col[0][0] * subFactor15 - _col[1][0] * subFactor17 + _col[2][0] * subFactor18
-		//	);
-
-		//	T determinant = + _col[0][0] * res[0][0] + _col[1][0] * res[0][1] + _col[2][0] * res[0][2] + _col[3][0] * res[0][3];
-
-		//	res = res * (1.0f / determinant);
-
-		//	return res;
-		//}
+			res = res * (1.0f / determinant);
+			return res;
+		}
 
 		void Scale(T x, T y, T z)
 		{
@@ -697,5 +705,116 @@ namespace Smile
 		pMatrix[2][3] = -1.0f;
 
 		return  pMatrix;
+	}
+
+	template<typename T>
+	void Swap(T& a, T& b)
+	{
+		T t = a;
+		a = b;
+		b = t;
+	}
+
+	template<typename T>
+	T Inverse(const _XMatrix4<T>& mIn, _XMatrix4<T>& mOut)
+	{
+		_XMatrix4<T> m(mIn);
+		int is[4];
+		int js[4];
+		T fDet = 1.0f;
+		T f = 1;
+
+		for (int k = 0; k < 4; k++)
+		{
+			// 第一步，全选主元
+			float fMax = 0.0f;
+			for (int i = k; i < 4; i++)
+			{
+				for (int j = k; j < 4; j++)
+				{
+					float f = abs(m[i][j]);
+					if (f > fMax)
+					{
+						fMax = f;
+						is[k] = i;
+						js[k] = j;
+					}
+				}
+			}
+
+			if (abs(fMax) < 0.0001f)
+				return 0;
+
+			if (is[k] != k)
+			{
+				f = -f;
+				Swap(m[k][0], m[is[k]][0]);
+				Swap(m[k][1], m[is[k]][1]);
+				Swap(m[k][2], m[is[k]][2]);
+				Swap(m[k][3], m[is[k]][3]);
+			}
+			if (js[k] != k)
+			{
+				f = -f;
+				Swap(m[0][k], m[0][js[k]]);
+				Swap(m[1][k], m[1][js[k]]);
+				Swap(m[2][k], m[2][js[k]]);
+				Swap(m[3][k], m[3][js[k]]);
+			}
+
+			// 计算行列值
+			fDet *= m[k][k];
+
+			// 计算逆矩阵
+
+			// 第二步
+			m[k][k] = 1.0f / m[k][k];
+
+			// 第三步
+			for (int j = 0; j < 4; j++)
+			{
+				if (j != k)
+					m[k][j] *= m[k][k];
+			}
+			// 第四步
+			for (int i = 0; i < 4; i++)
+			{
+				if (i != k)
+				{
+					for (int j = 0; j < 4; j++)
+					{
+						if (j != k)
+							m[i][j] = m[i][j] - m[i][k] * m[k][j];
+					}
+				}
+			}
+			// 第五步
+			for (int i = 0; i < 4; i++)
+			{
+				if (i != k)
+					m[i][k] *= -m[k][k];
+			}
+		}
+
+		for (int k = 3; k >= 0; k--)
+		{
+			if (js[k] != k)
+			{
+				Swap(m[k][0], m[js[k]][0]);
+				Swap(m[k][1], m[js[k]][1]);
+				Swap(m[k][2], m[js[k]][2]);
+				Swap(m[k][3], m[js[k]][3]);
+			}
+			if (is[k] != k)
+			{
+				Swap(m[0][k], m[0][is[k]]);
+				Swap(m[1][k], m[1][is[k]]);
+				Swap(m[2][k], m[2][is[k]]);
+				Swap(m[3][k], m[3][is[k]]);
+			}
+		}
+
+		mOut = m;
+		return fDet * f;
 	}
 }

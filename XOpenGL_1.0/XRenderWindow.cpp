@@ -1,6 +1,6 @@
 #include "XRenderWindow.h"
 
-#include "XCamera.h"
+#include "XCamera3rd.h"
 
 
 namespace Smile
@@ -58,8 +58,8 @@ namespace Smile
 	GLuint _texture1;
 	GLuint _texture2;
 
-	XCamera _camera;
-	//XVec3f _rolePos;
+	XCamera3rd _camera;
+	XVec3f _rolePos;
 
 	void DrawPlane(GLuint texture)
 	{
@@ -103,6 +103,31 @@ namespace Smile
 	{
 		switch (uMsg)
 		{
+		case WM_SIZE:
+		{
+			if (::IsWindow(hWnd))
+			{
+				RECT rect;
+				GetClientRect(_hWnd, &rect);
+				int w = rect.right - rect.left;
+				int h = rect.bottom - rect.top;
+				glViewport(0, 0, w, h);
+				_camera.SetViewport(w, h);
+			}
+		}
+		break;
+		case WM_LBUTTONDOWN:
+		{
+			int xPos = GET_X_LPARAM(lParam);
+			int yPos = GET_Y_LPARAM(lParam);
+			XVec2f screen(xPos, _h - yPos);
+			XRayf ray = _camera.CreateRayFromScreen(screen);
+			XVec3f origin = ray.GetOrigin();
+			float time = origin._y / ray.GetDir()._y;
+			XVec3f aim = origin + ray.GetDir() * abs(time);
+			_rolePos = aim;
+		}
+		break;
 		case WM_RBUTTONDOWN:
 		{
 			_x = GET_X_LPARAM(lParam);
@@ -134,11 +159,11 @@ namespace Smile
 		break;
 		case WM_MOUSEWHEEL:
 		{
-			//short zDelta = GET_WHEEL_DELTA_WPARAM(wParam);
-			//if (zDelta > 0)
-			//	_camera.OnScaleLength(1.2f);
-			//else
-			//	_camera.OnScaleLength(0.8f);
+			short zDelta = GET_WHEEL_DELTA_WPARAM(wParam);
+			if (zDelta > 0)
+				_camera.OnScaleLength(1.2f);
+			else
+				_camera.OnScaleLength(0.8f);
 		}
 		break;
 		case WM_CHAR:
@@ -147,26 +172,26 @@ namespace Smile
 			{
 			case 'W':
 			{
-				_camera.OnFront();
-				//_rolePos._x += 1.0f;
+				//_camera.OnFront();
+				_rolePos._x += 1.0f;
 			}
 			break;
 			case 'S':
 			{
-				_camera.OnBack();
-				//_rolePos._x -= 1.0f;
+				//_camera.OnBack();
+				_rolePos._x -= 1.0f;
 			}
 			break;
 			case 'A':
 			{
-				_camera.OnLeft();
-				//_rolePos._z -= 1.0f;
+				//_camera.OnLeft();
+				_rolePos._z -= 1.0f;
 			}
 			break;
 			case 'D':
 			{
-				_camera.OnRight();
-				//_rolePos._z += 1.0f;
+				//_camera.OnRight();
+				_rolePos._z += 1.0f;
 			}
 			break;
 			}
@@ -202,15 +227,13 @@ namespace Smile
 		}
 
 		_camera.Init(XVec3f(-10.0f, 10.0f, 10.0f), XVec3f(0.0f, 0.0f, 0.0f),XVec3f(0.0f, 1.0f, 0.0f));
-		//_rolePos._x = 0;
-		//_rolePos._y = 2.0f;
-		//_rolePos._z = 0;
+		_rolePos._x = 0.0f;
+		_rolePos._y = 0.0f;
+		_rolePos._z = 0.0f;
 
 		_RButtonDown = false;
 		_x = 0;
 		_y = 0;
-
-
 	}
 
 	void XRenderWindow::Render()
@@ -220,9 +243,12 @@ namespace Smile
 		glEnable(GL_DEPTH_TEST);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		_camera.SetViewport(_w, _h);
+
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
 
+		_camera.LookAtAim(_rolePos);
 		_camera.View();
 		_camera.Proj(60.0f, (float)_w / _h, 0.01f, 1000.0f);
 
@@ -230,7 +256,8 @@ namespace Smile
 
 		glLoadMatrixf(_mat.GetData());
 
-		glTranslatef(0.0f, 2.0f, 0.0f);
+		glTranslatef(_rolePos._x, _rolePos._y, _rolePos._z);
+		glScalef(0.1f, 0.1f, 0.1f);
 		DrawCube(_texture2);
 
 		glLoadMatrixf(_mat.GetData());

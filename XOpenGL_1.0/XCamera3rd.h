@@ -25,6 +25,11 @@ namespace Smile
 		void OnRotateY(float delta);
 		void OnScaleLength(float delta);
 
+		XMat4f GetMatPV();
+		void SetViewport(int w, int h);
+		void ScreenToWorld(XVec4f& screenPos, XVec4f& worldPos);
+		XRayf CreateRayFromScreen(const XVec2f screenPos);
+
 	private:
 		XVec3f _pos;
 		XVec3f _aim;
@@ -39,7 +44,7 @@ namespace Smile
 		XMat4f _matView;
 		XMat4f _matProj;
 
-	public:
-		XMat4f GetMatPV() { return _matProj * _matView; }
+		int _w;
+		int _h;
 	};
 }

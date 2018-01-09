@@ -71,4 +71,56 @@ namespace Smile
 	{
 		_length *= delta;
 	}
+
+	XMat4f XCamera3rd::GetMatPV() 
+	{ 
+		return _matProj * _matView; 
+	}
+
+	void XCamera3rd::SetViewport(int w, int h) 
+	{ 
+		_w = w;
+		_h = h;
+	}
+
+	void XCamera3rd::ScreenToWorld(XVec4f& screenPos, XVec4f& worldPos)
+ 	{
+		screenPos._x = screenPos._x / _w;
+		screenPos._y = screenPos._y / _h;
+		
+		screenPos._x = screenPos._x * 2.0f - 1.0f;
+		screenPos._y = screenPos._y * 2.0f - 1.0f;
+		screenPos._z = screenPos._z * 2.0f - 1.0f;
+
+		XMat4f matInverse;
+		Inverse<float>(_matProj * _matView, matInverse);
+
+		worldPos = matInverse * screenPos;
+
+		worldPos._x = worldPos._x / worldPos._w;
+		worldPos._y = worldPos._y / worldPos._w;
+		worldPos._z = worldPos._z / worldPos._w;
+		worldPos._w = 1.0f;
+	}
+
+	XRayf XCamera3rd::CreateRayFromScreen(const XVec2f screenPos)
+	{
+
+		XVec4f screenNear(screenPos._x, screenPos._y, 0.0f, 1.0f);
+		XVec4f screenFar(screenPos._x, screenPos._y, 1.0f, 1.0f);
+
+		XVec4f worldNear;
+		XVec4f worldFar;
+
+		ScreenToWorld(screenNear, worldNear);
+		ScreenToWorld(screenFar, worldFar);
+
+		XVec4f direction = worldFar - worldNear;
+
+		XVec3f origin(worldNear._x, worldNear._y, worldNear._z);
+		XVec3f dir(direction._x, direction._y, direction._z);
+
+		return XRayf(origin, dir);
+
+	}
 }
