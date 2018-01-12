@@ -326,9 +326,9 @@ namespace Smile
 			}
 		}
 
-		char title[32];
-		sprintf(title, "%d", count);
-		SetWindowTextA(_hWnd, title);
+		wchar_t title[32];
+		swprintf(title, L"Info:当前绘制个数：%d", count);
+		XLog::AddString(title);
 	}
 
 	void XRenderWindow::End()

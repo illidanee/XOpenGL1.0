@@ -2,6 +2,7 @@
 
 #include "XResource.h"
 #include "XGLWindow.h"
+#include "XLog.h"
 
 namespace Smile
 {

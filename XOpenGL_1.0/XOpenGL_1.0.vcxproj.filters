@@ -51,6 +51,9 @@
     <ClCompile Include="XCamera3rd.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="XFront.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="XGLContent.h">
@@ -90,6 +93,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="XFrustum.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="XFront.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
