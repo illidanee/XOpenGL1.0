@@ -102,5 +102,7 @@ namespace Smile
 		float _offsetX;
 		float _offsetY;
 
+		float _FrontMaxX;    //一行字体的最大宽度
+		float _FrontMaxY;	 //一行字体的最高点－最低点。
 	};
 }

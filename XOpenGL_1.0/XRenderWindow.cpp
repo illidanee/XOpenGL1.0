@@ -327,7 +327,7 @@ namespace Smile
 		}
 
 		wchar_t title[32];
-		swprintf(title, L"Info:当前绘制个数：%d", count);
+		swprintf(title, L"Info: 当前绘制个数：%d", count);
 		XLog::AddString(title);
 	}
 

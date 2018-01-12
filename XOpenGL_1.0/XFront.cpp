@@ -57,6 +57,9 @@ namespace Smile
 		 ****************************************************************************************************************/
 		_offsetX = 0.0f;
 		_offsetY = 0.0f;
+
+		_FrontMaxX = 0.0f;
+		_FrontMaxY = 0.0f;
 	}
 
 	void XFront::Done()
@@ -96,6 +99,9 @@ namespace Smile
 	XVec2f XFront::Draw(float x, float y, float z, BGRA8U color,const wchar_t* text)
 	{
 		XVec2f allSize = XVec2f(0.0f, 0.0f);
+
+		float maxY = 0.0f;
+		float minY = 0.0f;
 
 		unsigned int len = wcslen(text);
 		if (len == 0)
@@ -168,8 +174,11 @@ namespace Smile
 			startX += ch._Span._x;
 
 			//计算文字边框大小。
+			maxY = max(maxY, pVertices[i * 6 + 2]._Pos._y);
+			minY = min(minY, pVertices[i * 6 + 0]._Pos._y);
+
 			allSize._x += ch._Span._x;
-			allSize._y = max(ch._Size._y, allSize._y); 
+			allSize._y = max(allSize._y, maxY - minY);
 		}
 
 		/****************************************************************************************************************
@@ -234,40 +243,90 @@ namespace Smile
 		//保存数据。
 		if (pBitmap->width == 0 || pBitmap->rows == 0)
 		{
-			//没有数据
-			return _Characters[cIndex];
+			//计算最大值
+			_FrontMaxX = max(_FrontMaxX, _Size / 2.0f);
+			_FrontMaxY = max(_FrontMaxY, _Size);
+
+			//计算跨度
+			if (_offsetX + _Size / 2.0f >= _TextureW)
+			{
+				//写满一行,从新开始
+				_offsetX = 0;
+				_offsetY += _FrontMaxY;
+
+				//如果大于最大列。需要申请新的纹理。但是由于我们使用的纹理很大。所以现在不需要。
+				// ......
+			}
+
+			char mem[1024] = {};
+
+			//如果是无法显示的字体时：例如空格，则使用半个字符空间。
+			_Characters[cIndex]._found = true;
+
+			_Characters[cIndex]._Texture = _Texture;
+
+			_Characters[cIndex]._Pos._x = _offsetX;
+			_Characters[cIndex]._Pos._y = _offsetY;
+
+			_Characters[cIndex]._Size._x = _Size / 2.0f;
+			_Characters[cIndex]._Size._y = _Size;
+
+			_Characters[cIndex]._Offset._x = bitmapGlyph->left;
+			_Characters[cIndex]._Offset._y = bitmapGlyph->top;
+
+			_Characters[cIndex]._Span._x = _Face->glyph->advance.x / 64;
+			_Characters[cIndex]._Span._y = _Face->glyph->advance.y / 64;
+
+			glBindTexture(GL_TEXTURE_2D, _Texture);
+			glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+			glTexSubImage2D(GL_TEXTURE_2D, 0, _offsetX, _offsetY, _Size / 2.0f, _Size, GL_ALPHA, GL_UNSIGNED_BYTE, mem);
+			glBindTexture(GL_TEXTURE_2D, 0);
+
+			_offsetX += _Size / 2.0f + 1;
+		}
+		else
+		{
+			//计算最大值
+			_FrontMaxX = max(_FrontMaxX, pBitmap->width);
+			_FrontMaxY = max(_FrontMaxY, pBitmap->rows);
+
+			//计算跨度
+			if (_offsetX + pBitmap->width >= _TextureW)
+			{
+				//写满一行,从新开始
+				_offsetX = 0;
+				_offsetY += _FrontMaxY;
+
+				//如果大于最大列。需要申请新的纹理。但是由于我们使用的纹理很大。所以现在不需要。
+				// ......
+			}
+
+			_Characters[cIndex]._found = true;
+
+			_Characters[cIndex]._Texture = _Texture;
+
+			_Characters[cIndex]._Pos._x = _offsetX;
+			_Characters[cIndex]._Pos._y = _offsetY;
+
+			_Characters[cIndex]._Size._x = pBitmap->width;
+			_Characters[cIndex]._Size._y = pBitmap->rows;
+
+			_Characters[cIndex]._Offset._x = bitmapGlyph->left;
+			_Characters[cIndex]._Offset._y = bitmapGlyph->top;
+
+			_Characters[cIndex]._Span._x = _Face->glyph->advance.x / 64;
+			_Characters[cIndex]._Span._y = _Face->glyph->advance.y / 64;
+
+			glBindTexture(GL_TEXTURE_2D, _Texture);
+			glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+			glTexSubImage2D(GL_TEXTURE_2D, 0, _offsetX, _offsetY, pBitmap->width, pBitmap->rows, GL_ALPHA, GL_UNSIGNED_BYTE, pBitmap->buffer);
+
+			//计算跨度
+			_offsetX += pBitmap->width + 1;
 		}
 
-		_Characters[cIndex]._found = true;
-
-		_Characters[cIndex]._Texture = _Texture;
-
-		_Characters[cIndex]._Pos._x = _offsetX;
-		_Characters[cIndex]._Pos._y = _offsetY;
-		_Characters[cIndex]._Size._x = pBitmap->width;
-		_Characters[cIndex]._Size._y = pBitmap->rows;
-
-		_Characters[cIndex]._Offset._x = bitmapGlyph->left;
-		_Characters[cIndex]._Offset._y = bitmapGlyph->top;
-
-		_Characters[cIndex]._Span._x = _Face->glyph->advance.x / 64;
-		_Characters[cIndex]._Span._y = _Face->glyph->advance.y / 64;
-
-		glBindTexture(GL_TEXTURE_2D, _Texture);
-		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, _offsetX, _offsetY, pBitmap->width, pBitmap->rows, GL_ALPHA, GL_UNSIGNED_BYTE, pBitmap->buffer);
-
-		//计算跨度
-		_offsetX += pBitmap->width + 1;
-		if (_offsetX + _Size > _TextureW)
-		{
-			//写满一行,从新开始
-			_offsetX = 0;
-			_offsetY += max(pBitmap->rows, _Size);
-
-			//如果大于最大列。需要申请新的纹理。但是由于我们使用的纹理很大。所以现在不需要。
-			// ......
-		}	
+		//销毁
+		FT_Bitmap_Done(_Library, &newBitmap);
 
 		//返回
 		return _Characters[cIndex];
