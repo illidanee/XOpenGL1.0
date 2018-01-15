@@ -148,7 +148,7 @@ namespace Smile
 	 *
 	 ****************************************************************************************************************/
 	
-	wchar_t* pText = L" XÄãºÃ Hello gg!";
+	wchar_t* pText = L"XÄãºÃ   Hello gg! ";
 	XFront* pFront;
 	XUIText* pUIText;
 

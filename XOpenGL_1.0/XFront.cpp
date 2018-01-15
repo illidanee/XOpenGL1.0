@@ -345,7 +345,7 @@ namespace Smile
 		{
 			//计算最大值
 			_FrontMaxX = max(_FrontMaxX, _Size / 2.0f);
-			_FrontMaxY = max(_FrontMaxY, _Size);
+			_FrontMaxY = max(_FrontMaxY, _Size / 2.0f);
 
 			//计算跨度
 			if (_offsetX + _Size / 2.0f >= _TextureW)
@@ -368,18 +368,18 @@ namespace Smile
 			_Characters[cIndex]._Pos._x = _offsetX;
 			_Characters[cIndex]._Pos._y = _offsetY;
 
-			_Characters[cIndex]._Size._x = _Size / 2.0f;
-			_Characters[cIndex]._Size._y = 0;
+			_Characters[cIndex]._Size._w = _Size / 2.0f;
+			_Characters[cIndex]._Size._h = _Size / 2.0f;
 
 			_Characters[cIndex]._Offset._x = bitmapGlyph->left;
-			_Characters[cIndex]._Offset._y = bitmapGlyph->top;
+			_Characters[cIndex]._Offset._y = bitmapGlyph->top + _Size / 2.0f;
 
 			_Characters[cIndex]._Span._x = _Face->glyph->advance.x / 64;
 			_Characters[cIndex]._Span._y = _Face->glyph->advance.y / 64;
 
 			glBindTexture(GL_TEXTURE_2D, _Texture);
 			glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-			glTexSubImage2D(GL_TEXTURE_2D, 0, _offsetX, _offsetY, _Size / 2.0f, _Size, GL_ALPHA, GL_UNSIGNED_BYTE, mem);
+			glTexSubImage2D(GL_TEXTURE_2D, 0, _offsetX, _offsetY, _Size / 2.0f, _Size / 2.0f, GL_ALPHA, GL_UNSIGNED_BYTE, mem);
 			glBindTexture(GL_TEXTURE_2D, 0);
 
 			_offsetX += _Size / 2.0f + 1;
