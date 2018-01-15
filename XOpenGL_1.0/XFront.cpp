@@ -96,25 +96,27 @@ namespace Smile
 		glEnable(GL_DEPTH_TEST);
 	}
 
-	XVec2f XFront::Draw(float x, float y, float z, BGRA8U color,const wchar_t* text)
+	XRectf XFront::Draw(float x, float y, float z, BGRA8U color,const wchar_t* text)
 	{
-		XVec2f allSize = XVec2f(0.0f, 0.0f);
-
-		float maxY = 0.0f;
-		float minY = 0.0f;
+		XRectf rect = XRectf(0.0f, 0.0f, 0.0f, 0.0f);
 
 		unsigned int len = wcslen(text);
 		if (len == 0)
-			return allSize;
+			return rect;
 
 		/****************************************************************************************************************
 		 *
 		 *    Brief   : 生成顶点数据
 		 *
-		 ****************************************************************************************************************/
+		 ****************************************************************************************************************/		
 		float startX = x;
 		float startY = y;
 		float startZ = z;
+
+		float maxY = y;
+		float minY = y;
+
+		float maxOffset = 0.0f;
 
 		FrontVertex* pVertices = _FrontVertices;
 
@@ -124,7 +126,12 @@ namespace Smile
 			Character ch = GetCharacter(c);
 
 			float offsetX = ch._Offset._x;
-			float offsetY =  -(ch._Size._y - ch._Offset._y);
+			float offsetY = -(ch._Size._y - ch._Offset._y);
+
+			if (i == 0)
+			{
+				rect._x = startX + offsetX;
+			}
 
 			//第一个三角型
 			pVertices[i * 6 + 0]._Pos._x = startX + offsetX;
@@ -177,9 +184,14 @@ namespace Smile
 			maxY = max(maxY, pVertices[i * 6 + 2]._Pos._y);
 			minY = min(minY, pVertices[i * 6 + 0]._Pos._y);
 
-			allSize._x += ch._Span._x;
-			allSize._y = max(allSize._y, maxY - minY);
+			maxOffset = min(maxOffset, offsetY);
+
+			rect._w += ch._Span._x;
+			rect._h = max(rect._y, maxY - minY);
 		}
+
+		rect._y = startY + maxOffset;
+
 
 		/****************************************************************************************************************
 		 *
@@ -196,11 +208,99 @@ namespace Smile
 
 		glDrawArrays(GL_TRIANGLES, 0, len * 6);
 
+		FrontVertex poses[4] = {};
+
+		poses[0]._Pos = XVec3f(rect._x, rect._y, 0.0f);
+		poses[0]._UV = XVec2f(0, 0);
+		poses[0]._Color = BGRA8U(255, 0, 0, 255);
+
+		poses[1]._Pos = XVec3f(rect._x + rect._w, rect._y, 0.0f);
+		poses[1]._UV = XVec2f(0, 0);
+		poses[1]._Color = BGRA8U(255, 0, 0, 255);
+
+		poses[2]._Pos = XVec3f(rect._x + rect._w, rect._y + rect._h, 0.0f);
+		poses[2]._UV = XVec2f(0, 0);
+		poses[2]._Color = BGRA8U(255, 0, 0, 255);
+
+		poses[3]._Pos = XVec3f(rect._x, rect._y + rect._h, 0.0f);
+		poses[3]._UV = XVec2f(0, 0);
+		poses[3]._Color = BGRA8U(255, 0, 0, 255);
+
+		glVertexPointer(3, GL_FLOAT, sizeof(FrontVertex), &poses[0]._Pos);
+		glTexCoordPointer(2, GL_FLOAT, sizeof(FrontVertex), &poses[0]._UV);
+		glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(FrontVertex), &poses[0]._Color);
+
+		glDrawArrays(GL_LINE_LOOP, 0, 4);
+		
 		glDisableClientState(GL_VERTEX_ARRAY);
 		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 		glDisableClientState(GL_COLOR_ARRAY);
 
-		return allSize;
+		return rect;
+	}
+
+	XRectf XFront::GetSize(float x, float y, float z, const wchar_t* text)
+	{
+		XRectf rect = XRectf(0.0f, 0.0f, 0.0f, 0.0f);
+
+		unsigned int len = wcslen(text);
+		if (len == 0)
+			return rect;
+
+		/****************************************************************************************************************
+		*
+		*    Brief   : 生成顶点数据
+		*
+		****************************************************************************************************************/
+		float startX = x;
+		float startY = y;
+		float startZ = z;
+
+		float maxY = y;
+		float minY = y;
+
+		float maxOffset = 0.0f;
+
+		FrontVertex* pVertices = _FrontVertices;
+
+		for (unsigned int i = 0; i < len; ++i)
+		{
+			wchar_t c = text[i];
+			Character ch = GetCharacter(c);
+
+			float offsetX = ch._Offset._x;
+			float offsetY = -(ch._Size._y - ch._Offset._y);
+
+			if (i == 0)
+			{
+				rect._x = startX + offsetX;
+			}
+
+			//第一个三角型
+			pVertices[i * 6 + 0]._Pos._x = startX + offsetX;
+			pVertices[i * 6 + 0]._Pos._y = startY + offsetY;
+			pVertices[i * 6 + 0]._Pos._z = startZ;
+
+			pVertices[i * 6 + 2]._Pos._x = startX + offsetX + ch._Size._x;
+			pVertices[i * 6 + 2]._Pos._y = startY + offsetY + ch._Size._y;
+			pVertices[i * 6 + 2]._Pos._z = startZ;
+
+			//使用字体的advance作为跨度。
+			startX += ch._Span._x;
+
+			//计算文字边框大小。
+			maxY = max(maxY, pVertices[i * 6 + 2]._Pos._y);
+			minY = min(minY, pVertices[i * 6 + 0]._Pos._y);
+
+			maxOffset = min(maxOffset, offsetY);
+
+			rect._w += ch._Span._x;
+			rect._h = max(rect._y, maxY - minY);
+		}
+
+		rect._y = startY + maxOffset;
+
+		return rect;
 	}
 
 	Character& XFront::GetCharacter(unsigned int cIndex)
@@ -269,7 +369,7 @@ namespace Smile
 			_Characters[cIndex]._Pos._y = _offsetY;
 
 			_Characters[cIndex]._Size._x = _Size / 2.0f;
-			_Characters[cIndex]._Size._y = _Size;
+			_Characters[cIndex]._Size._y = 0;
 
 			_Characters[cIndex]._Offset._x = bitmapGlyph->left;
 			_Characters[cIndex]._Offset._y = bitmapGlyph->top;

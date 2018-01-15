@@ -61,7 +61,8 @@ namespace Smile
 
 		void Begin(int screenW, int screenH);
 		void End();
-		XVec2f Draw(float x, float y, float z, BGRA8U color, const wchar_t* pContent);
+		XRectf Draw(float x, float y, float z, BGRA8U color, const wchar_t* text);
+		XRectf GetSize(float x, float y, float z, const wchar_t* text);
 
 	private:
 		Character& GetCharacter(unsigned int cIndex);
@@ -104,5 +105,7 @@ namespace Smile
 
 		float _FrontMaxX;    //一行字体的最大宽度
 		float _FrontMaxY;	 //一行字体的最高点－最低点。
+
+		float maxOffsetY;	//最大Y偏移。
 	};
 }

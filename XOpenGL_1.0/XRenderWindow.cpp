@@ -3,6 +3,9 @@
 #include "XCamera3rd.h"
 #include "XFrustum.h"
 
+#include "XFront.h"
+#include "XUIObject.h"
+
 namespace Smile
 {
 	struct Vertex
@@ -139,6 +142,21 @@ namespace Smile
 	XNode* g_pPlane;
 	XNode* g_pNodes;
 
+	/****************************************************************************************************************
+	 *
+	 *    Brief   : UI
+	 *
+	 ****************************************************************************************************************/
+	
+	wchar_t* pText = L" X你好 Hello gg!";
+	XFront* pFront;
+	XUIText* pUIText;
+
+	/****************************************************************************************************************
+	 *
+	 *    Brief   : 类
+	 *
+	 ****************************************************************************************************************/
 	void XRenderWindow::Event(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		switch (uMsg)
@@ -158,20 +176,39 @@ namespace Smile
 		break;
 		case WM_LBUTTONDOWN:
 		{
+			//int xPos = GET_X_LPARAM(lParam);
+			//int yPos = GET_Y_LPARAM(lParam);
+			//XVec2f screen(xPos, _h - yPos);
+			//XRayf ray = _camera.CreateRayFromScreen(screen);
+			//XVec3f origin = ray.GetOrigin();
+			//float time = origin._y / ray.GetDir()._y;
+			//XVec3f aim = origin + ray.GetDir() * abs(time);
+			//_rolePos = aim;
+
 			int xPos = GET_X_LPARAM(lParam);
 			int yPos = GET_Y_LPARAM(lParam);
-			XVec2f screen(xPos, _h - yPos);
-			XRayf ray = _camera.CreateRayFromScreen(screen);
-			XVec3f origin = ray.GetOrigin();
-			float time = origin._y / ray.GetDir()._y;
-			XVec3f aim = origin + ray.GetDir() * abs(time);
-			_rolePos = aim;
+			POINT screen = { xPos, _h - yPos };
+
+			XRectf rect1 = pUIText->GetRect();
+			RECT rect2 = { rect1._x, rect1._y, rect1._x + rect1._w, rect1._y + rect1._h };
+
+			if (PtInRect(&rect2, screen))
+			{
+				_lx = GET_X_LPARAM(lParam);
+				_ly = _h - GET_Y_LPARAM(lParam);
+				_LButtonDown = true;
+			}
+		}
+		break;
+		case WM_LBUTTONUP:
+		{
+			_LButtonDown = false;
 		}
 		break;
 		case WM_RBUTTONDOWN:
 		{
-			_x = GET_X_LPARAM(lParam);
-			_y = GET_Y_LPARAM(lParam);
+			_rx = GET_X_LPARAM(lParam);
+			_ry = GET_Y_LPARAM(lParam);
 			_RButtonDown = true;
 		}
 		break;
@@ -182,18 +219,34 @@ namespace Smile
 		break;
 		case WM_MOUSEMOVE:
 		{
+			if (_LButtonDown)
+			{
+				int x = GET_X_LPARAM(lParam);
+				int y = _h - GET_Y_LPARAM(lParam);
+				int offsetX = x - _lx;
+				int offsetY = y - _ly;
+
+				_lx = x;
+				_ly = y;
+
+				XVec3f pos = pUIText->GetPos();
+				pos._x += offsetX;
+				pos._y += offsetY;
+				pUIText->SetPos(pos);
+			}
+
 			if (_RButtonDown)
 			{
 				int x = GET_X_LPARAM(lParam);
 				int y = GET_Y_LPARAM(lParam);
-				int offsetX = x - _x;
-				int offsetY = y - _y;
+				int offsetX = x - _rx;
+				int offsetY = y - _ry;
 				
 				_camera.OnRotateX(offsetY * 0.1f);
 				_camera.OnRotateY(offsetX * 0.1f);
 				
-				_x = x;
-				_y = y;
+				_rx = x;
+				_ry = y;
 			}
 		}
 		break;
@@ -271,9 +324,13 @@ namespace Smile
 		_rolePos._y = 0.0f;
 		_rolePos._z = 0.0f;
 
+		_LButtonDown = false;
+		_lx = 0;
+		_ly = 0;
+
 		_RButtonDown = false;
-		_x = 0;
-		_y = 0;
+		_rx = 0;
+		_ry = 0;
 
 		g_Plane.Init(_texture1, g_PlaneVertices, 4);
 		g_Cube.Init(_texture2, g_CubeVertices, 24);
@@ -290,6 +347,22 @@ namespace Smile
 			g_pNodes[i]._pos._z = rand() % 200 - 100;
 			g_pNodes[i]._pRenderable = &g_Cube;
 		}
+
+
+		/****************************************************************************************************************
+		*
+		*    Brief   : UI
+		*
+		****************************************************************************************************************/
+
+		pFront = new XFront();
+		pFront->Init("../Resources/simsun.ttc", 1024, 1024, 32);
+		pUIText = new XUIText();
+		XRectf rect = pFront->GetSize(100.0f, 100.0f, 0.0f, pText);
+		pUIText->Init(XVec3f(100.0f, 100.0f, 0.0f), rect, BGRA8U(255, 255, 0, 255), pText);
+
+
+		//XLog::AddString(L"初始化成功！");
 	}
 
 	void XRenderWindow::Render()
@@ -299,21 +372,26 @@ namespace Smile
 		glEnable(GL_DEPTH_TEST);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		_camera.SetViewport(_w, _h);
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
 
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
 
+		_camera.SetViewport(_w, _h);
 		_camera.LookAtAim(_rolePos);
 		_camera.View();
 		_camera.Proj(60.0f, (float)_w / _h, 0.01f, 1000.0f);
 
 		XMat4f _mat = _camera.GetMatPV();
+		glLoadMatrixf(_mat.GetData());
 
 		_frustum.Init(_mat);
 
-		glLoadMatrixf(_mat.GetData());
+		glEnable(GL_DEPTH_TEST);
+		glEnable(GL_TEXTURE_2D);
 
+		//绘制场景
 		g_pPlane->Render();
 
 		int count = 0;
@@ -326,15 +404,32 @@ namespace Smile
 			}
 		}
 
-		wchar_t title[32];
-		swprintf(title, L"Info: 当前绘制个数：%d", count);
-		XLog::AddString(title);
+		glDisable(GL_TEXTURE_2D);
+		glDisable(GL_DEPTH_TEST);
+
+		//绘制UI
+		XVec3f pos = pUIText->GetPos();
+		BGRA8U color = pUIText->GetColor();
+		wchar_t* pText = pUIText->GetText();
+
+		pFront->Begin(_w, _h);
+		pUIText->SetRect(pFront->Draw(pos._x, pos._y, pos._z, color, pText));
+		pFront->End();
+
+		////打印日志
+		//wchar_t title[32];
+		//swprintf(title, L"Info: 当前绘制个数：%d", count);
+		//XLog::AddString(title);
 	}
 
 	void XRenderWindow::End()
 	{
 		glDeleteTextures(1, &_texture1);
 		glDeleteTextures(1, &_texture2);
+
+		pFront->Done();
+		delete pFront;
+		delete pUIText;
 	}
 }
 

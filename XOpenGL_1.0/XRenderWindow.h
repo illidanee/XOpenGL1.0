@@ -13,8 +13,12 @@ namespace Smile
 		void Render();
 		void End();
 
+		bool _LButtonDown;
+		int _lx;
+		int _ly;
+
 		bool _RButtonDown;
-		int _x;
-		int _y;
+		int _rx;
+		int _ry;
 	};
 }

@@ -166,6 +166,7 @@
     <ClCompile Include="XLog.cpp" />
     <ClCompile Include="XRenderWindow.cpp" />
     <ClCompile Include="XResource.cpp" />
+    <ClCompile Include="XUIObject.cpp" />
     <ClCompile Include="XVideo.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -182,6 +183,7 @@
     <ClInclude Include="XMath.h" />
     <ClInclude Include="XRenderWindow.h" />
     <ClInclude Include="XResource.h" />
+    <ClInclude Include="XUIObject.h" />
     <ClInclude Include="XVideo.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

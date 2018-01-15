@@ -54,6 +54,9 @@
     <ClCompile Include="XFront.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="XUIObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="XGLContent.h">
@@ -96,6 +99,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="XFront.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="XUIObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

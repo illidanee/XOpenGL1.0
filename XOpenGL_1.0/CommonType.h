@@ -38,4 +38,22 @@ namespace Smile
 			left._a + (255 - left._a) * ((float)right._a / 255)
 			);
 	}
+
+	template<typename T>
+	class _XRect
+	{
+	public:
+		_XRect() {}
+		_XRect(T x, T y, T w, T h) : _x(x), _y(y), _w(w), _h(h) {}
+
+		struct  
+		{
+			T _x;
+			T _y;
+			T _w;
+			T _h;
+		};
+	};
+
+	typedef _XRect<float> XRectf;
 }
