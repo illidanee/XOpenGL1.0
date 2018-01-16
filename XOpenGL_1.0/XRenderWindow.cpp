@@ -197,6 +197,8 @@ namespace Smile
 				_lx = GET_X_LPARAM(lParam);
 				_ly = _h - GET_Y_LPARAM(lParam);
 				_LButtonDown = true;
+
+				pUIText->_pFunc(*pUIText);
 			}
 		}
 		break;
@@ -360,7 +362,7 @@ namespace Smile
 		pUIText = new XUIText();
 		XRectf rect = pFront->GetSize(100.0f, 100.0f, 0.0f, pText);
 		pUIText->Init(XVec3f(100.0f, 100.0f, 0.0f), rect, BGRA8U(255, 255, 0, 255), pText);
-
+		pUIText->_pFunc = OnClick;
 
 		//XLog::AddString(L"初始化成功！");
 	}

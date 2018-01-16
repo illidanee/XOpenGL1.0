@@ -1,7 +1,10 @@
 #pragma once
 
+#include <stdio.h>
+
 #include "CommonType.h"
 #include "XMath.h"
+#include "XLog.h"
 
 namespace Smile
 {
@@ -30,6 +33,8 @@ namespace Smile
 		XVec3f _Pos;
 		XRectf _Rect;
 	};
+
+	typedef void(*LPFUNC) (XUIObject& obj);
 
 	class XUIText : public XUIObject
 	{
@@ -64,5 +69,11 @@ namespace Smile
 	protected:
 		BGRA8U _Color;
 		wchar_t* _pText;
+
+	public:
+		LPFUNC _pFunc;
 	};
+
+	//»Øµ÷º¯Êý£º
+	void OnClick(XUIObject& obj);
 }
