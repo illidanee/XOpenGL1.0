@@ -22,6 +22,9 @@ namespace Smile
 
 	void XLog::Render()
 	{
+		//修正最小化后字体大小发生变化的BUG
+		glViewport(0, 0, _w, _h);
+
 		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
