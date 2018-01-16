@@ -15,6 +15,45 @@ namespace Smile
 #define PI 3.1415926f
 #define ANGLE2RADIAN(angle) ( 2.0f * PI / 360.0f * (angle))
 
+	/****************************************************************************************************************
+	*
+	*    Brief   : 颜色
+	*
+	****************************************************************************************************************/
+	template<typename T>
+	class _BGRA
+	{
+	public:
+		_BGRA() {}
+		_BGRA(T b, T g, T r, T a) : _b(b), _g(g), _r(r), _a(a) { }
+		_BGRA(unsigned int color) : _color(color) { }
+
+		union
+		{
+			struct
+			{
+				T _b;
+				T _g;
+				T _r;
+				T _a;
+			};
+			unsigned int _color;
+		};
+	};
+
+	typedef _BGRA<unsigned char> BGRA8U;
+
+	//全局函数
+	template<typename T>
+	_BGRA<T> operator + (const _BGRA<T>& left, const _BGRA<T>& right)
+	{
+		return  _BGRA<T>(
+			left._b + (255 - left._b) * ((float)right._b / 255),
+			left._g + (255 - left._g) * ((float)right._g / 255),
+			left._r + (255 - left._r) * ((float)right._r / 255),
+			left._a + (255 - left._a) * ((float)right._a / 255)
+			);
+	}
 	
 	/****************************************************************************************************************
 	 *    Date    : 2017/12/12 14:21
@@ -576,6 +615,162 @@ namespace Smile
 	};
 
 	typedef _XRay<float> XRayf;
+
+	/****************************************************************************************************************
+	*    Date    : 2017/12/12 14:19
+	*
+	*    Author  : Smile
+	*    Contact : smile@illidan.org
+	*
+	*    Brief   : 平面抽象
+	*
+	****************************************************************************************************************/
+	template<typename T>
+	class _XPlane
+	{
+	public:
+		_XPlane() {}
+		_XPlane(T a, T b, T c, T d) : _a(a), _b(b), _c(c), _d(d) {}
+
+		T Compute(T x, T y, T z)
+		{
+			return _a * x + _b * y + _c * z + _d;
+		}
+
+		T Compute(_XVector3<T> vector)
+		{
+			return _a * vector._x + _b * vector._y + _c * vector._z + _d;
+		}
+
+	public:
+		union
+		{
+			struct
+			{
+				T _a;
+				T _b;
+				T _c;
+				T _d;
+			};
+			T _data[4];
+		};
+
+	};
+
+	typedef _XPlane<float> XPlanef;
+
+
+	/****************************************************************************************************************
+	*    Date    : 2017/12/12 14:19
+	*
+	*    Author  : Smile
+	*    Contact : smile@illidan.org
+	*
+	*    Brief   : 视椎体抽象
+	*
+	****************************************************************************************************************/
+	template<typename T>
+	class _XFrustum
+	{
+	private:
+		enum
+		{
+			TopFace = 0,
+			DownFace = 1,
+			LeftFace = 2,
+			RightFace = 3,
+			FrontFace = 4,
+			BackFace = 5
+		};
+
+	public:
+		_XFrustum() {}
+
+		void Init(_XMatrix4<T> pvMat)
+		{
+			_planes[TopFace] = _XPlane<T>(pvMat[0][3] - pvMat[0][1], pvMat[1][3] - pvMat[1][1], pvMat[2][3] - pvMat[2][1], pvMat[3][3] - pvMat[3][1]);
+			_planes[DownFace] = _XPlane<T>(pvMat[0][3] + pvMat[0][1], pvMat[1][3] + pvMat[1][1], pvMat[2][3] + pvMat[2][1], pvMat[3][3] + pvMat[3][1]);
+
+			_planes[LeftFace] = _XPlane<T>(pvMat[0][3] + pvMat[0][0], pvMat[1][3] + pvMat[1][0], pvMat[2][3] + pvMat[2][0], pvMat[3][3] + pvMat[3][0]);
+			_planes[RightFace] = _XPlane<T>(pvMat[0][3] - pvMat[0][0], pvMat[1][3] - pvMat[1][0], pvMat[2][3] - pvMat[2][0], pvMat[3][3] - pvMat[3][0]);
+
+			_planes[FrontFace] = _XPlane<T>(pvMat[0][3] - pvMat[0][2], pvMat[1][3] - pvMat[1][2], pvMat[2][3] - pvMat[2][2], pvMat[3][3] - pvMat[3][2]);
+			_planes[BackFace] = _XPlane<T>(pvMat[0][3] + pvMat[0][2], pvMat[1][3] + pvMat[1][2], pvMat[2][3] + pvMat[2][2], pvMat[3][3] + pvMat[3][2]);
+		}
+
+		bool PointInFrustum(_XVector3<T> point)
+		{
+			for (int i = TopFace; i <= BackFace; ++i)
+			{
+				if (_planes[i].Compute(point) < 0)
+					return false;
+			}
+			return true;
+		}
+
+	private:
+		_XPlane<T> _planes[6];
+	};
+
+	typedef _XFrustum<float> XFrustumf;
+
+	/****************************************************************************************************************
+	 *
+	 *    Brief   : Point
+	 *
+	 ****************************************************************************************************************/
+	template<typename T>
+	class _XPoint
+	{
+	public:
+		_XPoint() {}
+		_XPoint(T x, T y) : _x(x), _y(y) {}
+
+		struct 
+		{
+			T _x;
+			T _y;
+		};
+	};
+
+	typedef _XPoint<float> XPointf;
+
+	/****************************************************************************************************************
+	*
+	*    Brief   : Rect
+	*
+	****************************************************************************************************************/
+	template<typename T>
+	class _XRect
+	{
+	public:
+		_XRect() {}
+		_XRect(T x, T y, T w, T h) : _x(x), _y(y), _w(w), _h(h) {}
+
+		struct
+		{
+			T _x;
+			T _y;
+			T _w;
+			T _h;
+		};
+	};
+
+	typedef _XRect<float> XRectf;
+
+	/****************************************************************************************************************
+	 *
+	 *    Brief   : 全局函数
+	 *
+	 ****************************************************************************************************************/
+	template<typename T>
+	bool PointInRect(_XPoint<T> point, _XRect<T> rect)
+	{
+		if (point._x < rect._x || point._x > rect._x + rect._w || point._y < rect._y || point._y > rect._y + rect._h)
+			return false;
+
+		return true;
+	}
 
 	/****************************************************************************************************************
 	 *    Date    : 2017/12/12 14:20

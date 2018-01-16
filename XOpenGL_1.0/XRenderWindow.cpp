@@ -1,7 +1,6 @@
 #include "XRenderWindow.h"
 
 #include "XCamera3rd.h"
-#include "XFrustum.h"
 
 #include "XFront.h"
 #include "XUIObject.h"
@@ -147,10 +146,13 @@ namespace Smile
 	 *    Brief   : UI
 	 *
 	 ****************************************************************************************************************/
-	
+	XUIManager _gUIManager;
+
 	wchar_t* pText = L"你好   Hello gg!";
 	XFront* pFront;
 	XUIText* pUIText;
+
+	XUIButton* pUIButton;
 
 	/****************************************************************************************************************
 	 *
@@ -200,11 +202,20 @@ namespace Smile
 
 				pUIText->_pFunc(*pUIText);
 			}
+
+			XPointf point(xPos, _h - yPos);
+			_gUIManager.OnMsg(WM_LBUTTONDOWN, point);
 		}
 		break;
 		case WM_LBUTTONUP:
 		{
+			int xPos = GET_X_LPARAM(lParam);
+			int yPos = GET_Y_LPARAM(lParam);
+
 			_LButtonDown = false;
+
+			XPointf point(xPos, _h - yPos);
+			_gUIManager.OnMsg(WM_LBUTTONUP, point);
 		}
 		break;
 		case WM_RBUTTONDOWN:
@@ -221,6 +232,9 @@ namespace Smile
 		break;
 		case WM_MOUSEMOVE:
 		{
+			int xPos = GET_X_LPARAM(lParam);
+			int yPos = GET_Y_LPARAM(lParam);
+
 			if (_LButtonDown)
 			{
 				int x = GET_X_LPARAM(lParam);
@@ -250,6 +264,9 @@ namespace Smile
 				_rx = x;
 				_ry = y;
 			}
+
+			XPointf point(xPos, _h - yPos);
+			_gUIManager.OnMsg(WM_MOUSEMOVE, point);
 		}
 		break;
 		case WM_MOUSEWHEEL:
@@ -364,6 +381,10 @@ namespace Smile
 		pUIText->Init(XVec3f(100.0f, 100.0f, 0.0f), rect, BGRA8U(255, 255, 0, 255), pText);
 		pUIText->_pFunc = OnClick;
 
+		pUIButton = new XUIButton;
+		pUIButton->Init(XVec3f(100.0f, 100.0f, 0.0f), XRectf(100, 200, 200, 50));
+
+		_gUIManager.AddObj(pUIButton);
 		//XLog::AddString(L"初始化成功！");
 	}
 
@@ -419,10 +440,15 @@ namespace Smile
 		pUIText->SetRect(rect);
 		pFront->End();
 
+		//使用UI管理器绘制按钮
+		_gUIManager.Begin(_w, _h);
+		_gUIManager.Render();
+		_gUIManager.End();
+
 		//打印日志
-		wchar_t title[32];
-		swprintf(title, L"Info: 当前绘制个数：%d", count);
-		XLog::AddString(title);
+		//wchar_t title[32];
+		//swprintf(title, L"Info: 当前绘制个数：%d", count);
+		//XLog::AddString(title);
 	}
 
 	void XRenderWindow::End()

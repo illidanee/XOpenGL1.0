@@ -10,7 +10,6 @@
 #include <gl/GL.h>
 #include <gl/GLU.h>
 
-#include "CommonType.h"
 #include "XMath.h"
 
 namespace Smile

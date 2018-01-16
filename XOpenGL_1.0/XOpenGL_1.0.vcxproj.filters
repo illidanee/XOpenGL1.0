@@ -95,9 +95,6 @@
     <ClInclude Include="XCamera3rd.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="XFrustum.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="XFront.h">
       <Filter>Header Files</Filter>
     </ClInclude>
