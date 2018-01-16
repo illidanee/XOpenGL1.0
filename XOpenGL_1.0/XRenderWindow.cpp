@@ -148,7 +148,7 @@ namespace Smile
 	 *
 	 ****************************************************************************************************************/
 	
-	wchar_t* pText = L"X你好   Hello gg! ";
+	wchar_t* pText = L"你好   Hello gg!";
 	XFront* pFront;
 	XUIText* pUIText;
 
@@ -413,13 +413,14 @@ namespace Smile
 		wchar_t* pText = pUIText->GetText();
 
 		pFront->Begin(_w, _h);
-		pUIText->SetRect(pFront->Draw(pos._x, pos._y, pos._z, color, pText));
+		XRectf rect = pFront->Draw(pos._x, pos._y, pos._z, color, pText, true);
+		pUIText->SetRect(rect);
 		pFront->End();
 
-		////打印日志
-		//wchar_t title[32];
-		//swprintf(title, L"Info: 当前绘制个数：%d", count);
-		//XLog::AddString(title);
+		//打印日志
+		wchar_t title[32];
+		swprintf(title, L"Info: 当前绘制个数：%d", count);
+		XLog::AddString(title);
 	}
 
 	void XRenderWindow::End()

@@ -61,7 +61,7 @@ namespace Smile
 
 		void Begin(int screenW, int screenH);
 		void End();
-		XRectf Draw(float x, float y, float z, BGRA8U color, const wchar_t* text);
+		XRectf Draw(float x, float y, float z, BGRA8U color, const wchar_t* text, bool bDrawBorder = false);
 		XRectf GetSize(float x, float y, float z, const wchar_t* text);
 
 	private:

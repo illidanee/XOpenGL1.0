@@ -85,18 +85,16 @@ namespace Smile
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glEnable(GL_TEXTURE_2D);
-		glBindTexture(GL_TEXTURE_2D, _Texture);
 	}
 
 	void XFront::End()
 	{
-		glBindTexture(GL_TEXTURE_2D, 0);
 		glDisable(GL_TEXTURE_2D);
 		glDisable(GL_BLEND);
 		glEnable(GL_DEPTH_TEST);
 	}
 
-	XRectf XFront::Draw(float x, float y, float z, BGRA8U color,const wchar_t* text)
+	XRectf XFront::Draw(float x, float y, float z, BGRA8U color,const wchar_t* text, bool bDrawBorder)
 	{
 		XRectf rect = XRectf(0.0f, 0.0f, 0.0f, 0.0f);
 
@@ -195,7 +193,7 @@ namespace Smile
 
 		/****************************************************************************************************************
 		 *
-		 *    Brief   : 绘制
+		 *    Brief   : 绘制文字
 		 *
 		 ****************************************************************************************************************/
 		glEnableClientState(GL_VERTEX_ARRAY);
@@ -206,34 +204,53 @@ namespace Smile
 		glTexCoordPointer(2, GL_FLOAT, sizeof(FrontVertex), &pVertices[0]._UV);
 		glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(FrontVertex), &pVertices[0]._Color);
 
+
+		glBindTexture(GL_TEXTURE_2D, _Texture);
 		glDrawArrays(GL_TRIANGLES, 0, len * 6);
+		glBindTexture(GL_TEXTURE_2D, 0);
 
-		FrontVertex poses[4] = {};
 
-		poses[0]._Pos = XVec3f(rect._x, rect._y, 0.0f);
-		poses[0]._UV = XVec2f(0, 0);
-		poses[0]._Color = BGRA8U(255, 0, 0, 255);
+		//glDisableClientState(GL_VERTEX_ARRAY);
+		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+		//glDisableClientState(GL_COLOR_ARRAY);
 
-		poses[1]._Pos = XVec3f(rect._x + rect._w, rect._y, 0.0f);
-		poses[1]._UV = XVec2f(0, 0);
-		poses[1]._Color = BGRA8U(255, 0, 0, 255);
+		/****************************************************************************************************************
+		 *
+		 *    Brief   : 绘制边框
+		 *
+		 ****************************************************************************************************************/
+		 //glEnableClientState(GL_VERTEX_ARRAY);
+		 //glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+		 //glEnableClientState(GL_COLOR_ARRAY);
+		if (bDrawBorder)
+		{
+			FrontVertex poses[4] = {};
 
-		poses[2]._Pos = XVec3f(rect._x + rect._w, rect._y + rect._h, 0.0f);
-		poses[2]._UV = XVec2f(0, 0);
-		poses[2]._Color = BGRA8U(255, 0, 0, 255);
+			poses[0]._Pos = XVec3f(rect._x, rect._y, 0.0f);
+			poses[0]._UV = XVec2f(0, 0);
+			poses[0]._Color = BGRA8U(255, 0, 0, 255);
 
-		poses[3]._Pos = XVec3f(rect._x, rect._y + rect._h, 0.0f);
-		poses[3]._UV = XVec2f(0, 0);
-		poses[3]._Color = BGRA8U(255, 0, 0, 255);
+			poses[1]._Pos = XVec3f(rect._x + rect._w, rect._y, 0.0f);
+			poses[1]._UV = XVec2f(0, 0);
+			poses[1]._Color = BGRA8U(255, 0, 0, 255);
 
-		glVertexPointer(3, GL_FLOAT, sizeof(FrontVertex), &poses[0]._Pos);
-		glTexCoordPointer(2, GL_FLOAT, sizeof(FrontVertex), &poses[0]._UV);
-		glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(FrontVertex), &poses[0]._Color);
+			poses[2]._Pos = XVec3f(rect._x + rect._w, rect._y + rect._h, 0.0f);
+			poses[2]._UV = XVec2f(0, 0);
+			poses[2]._Color = BGRA8U(255, 0, 0, 255);
 
-		glDrawArrays(GL_LINE_LOOP, 0, 4);
+			poses[3]._Pos = XVec3f(rect._x, rect._y + rect._h, 0.0f);
+			poses[3]._UV = XVec2f(0, 0);
+			poses[3]._Color = BGRA8U(255, 0, 0, 255);
+
+			glVertexPointer(3, GL_FLOAT, sizeof(FrontVertex), &poses[0]._Pos);
+			//glTexCoordPointer(2, GL_FLOAT, sizeof(FrontVertex), &poses[0]._UV);
+			glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(FrontVertex), &poses[0]._Color);
+
+			glDrawArrays(GL_LINE_LOOP, 0, 4);
+		}
 		
 		glDisableClientState(GL_VERTEX_ARRAY);
-		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+		//glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 		glDisableClientState(GL_COLOR_ARRAY);
 
 		return rect;
