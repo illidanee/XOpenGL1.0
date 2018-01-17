@@ -306,6 +306,18 @@ namespace Smile
 				_rolePos._z += 1.0f;
 			}
 			break;
+			case 'o':
+			case 'O':
+			{
+				pFront->SaveInfo("XXX");
+			}
+			break;
+			case 'l':
+			case 'L':
+			{
+				pFront->LoadInfo("XXX");
+			}
+			break;
 			}
 		}
 		break;
@@ -375,7 +387,8 @@ namespace Smile
 		****************************************************************************************************************/
 
 		pFront = new XFront();
-		pFront->Init("../Resources/simsun.ttc", 1024, 1024, 32);
+		//pFront->Init("../Resources/simsun.ttc", 1024, 1024, 32);
+		pFront->LoadInfo("XXX");
 		pUIText = new XUIText();
 		XRectf rect = pFront->GetSize(100.0f, 100.0f, 0.0f, pText);
 		pUIText->Init(XVec3f(100.0f, 100.0f, 0.0f), rect, BGRA8U(255, 255, 0, 255), pText);
@@ -456,7 +469,7 @@ namespace Smile
 		glDeleteTextures(1, &_texture1);
 		glDeleteTextures(1, &_texture2);
 
-		pFront->Done();
+		//pFront->Done();
 		delete pFront;
 		delete pUIText;
 	}

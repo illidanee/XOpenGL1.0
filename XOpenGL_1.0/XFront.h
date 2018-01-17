@@ -11,6 +11,7 @@
 #include <gl/GLU.h>
 
 #include "XMath.h"
+#include "XResource.h"
 
 namespace Smile
 {
@@ -62,6 +63,9 @@ namespace Smile
 		void End();
 		XRectf Draw(float x, float y, float z, BGRA8U color, const wchar_t* text, bool bDrawBorder = false);
 		XRectf GetSize(float x, float y, float z, const wchar_t* text);
+
+		void SaveInfo(const char* pFile);
+		void LoadInfo(const char* pFile);
 
 	private:
 		Character& GetCharacter(unsigned int cIndex);

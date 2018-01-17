@@ -85,6 +85,7 @@ namespace Smile
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glEnable(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, _Texture);
 	}
 
 	void XFront::End()
@@ -92,6 +93,7 @@ namespace Smile
 		glDisable(GL_TEXTURE_2D);
 		glDisable(GL_BLEND);
 		glEnable(GL_DEPTH_TEST);
+		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
 	XRectf XFront::Draw(float x, float y, float z, BGRA8U color,const wchar_t* text, bool bDrawBorder)
@@ -318,6 +320,115 @@ namespace Smile
 		rect._y = startY + maxOffset;
 
 		return rect;
+	}
+
+	void XFront::SaveInfo(const char* pFile)
+	{
+		/****************************************************************************************************************
+		 *
+		 *    Brief   : 保存字体数据
+		 *
+		 ****************************************************************************************************************/
+		//保存为文件
+		char frontFileName[32] = {};
+		sprintf(frontFileName, "%s.FC", pFile);
+		FILE* pfFront = fopen(frontFileName, "wb");
+		if (pfFront == 0)
+		{
+			return;
+		}
+		size_t num = fwrite(_Characters, sizeof(Character), 1 << 16, pfFront);
+		fclose(pfFront);
+
+		/****************************************************************************************************************
+		 *
+		 *    Brief   : 保存纹理数据
+		 *
+		 ****************************************************************************************************************/
+		//保存为文件
+		char texFileName[32] = {};
+		sprintf(texFileName, "%s.FT", pFile);
+		FILE* pfTex = fopen(texFileName, "wb");
+		if (pfTex == 0)
+		{
+			return;
+		}
+
+		char* pBuffer = new char[_TextureW * _TextureH];
+		glBindTexture(GL_TEXTURE_2D, _Texture);
+		glGetTexImage(GL_TEXTURE_2D, 0, GL_ALPHA, GL_UNSIGNED_BYTE, pBuffer);
+
+		//保存为图片
+		//XResource::SaveTextureFileOnlyA("./front.png", pBuffer, _TextureW, _TextureH);
+
+		fwrite(&_TextureW, sizeof(int), 1, pfTex);
+		fwrite(&_TextureH, sizeof(int), 1, pfTex);
+		fwrite(pBuffer, _TextureW * _TextureH, 1, pfTex);
+		
+		glBindTexture(GL_TEXTURE_2D, 0);
+
+		delete[] pBuffer;
+
+		fclose(pfTex);
+	}
+
+	void XFront::LoadInfo(const char* pFile)
+	{
+		/****************************************************************************************************************
+		*
+		*    Brief   : 读取字体数据
+		*
+		****************************************************************************************************************/
+		//读取文件
+		char frontFileName[32] = {};
+		sprintf(frontFileName, "%s.FC", pFile);
+		FILE* pfFront = fopen(frontFileName, "rb");
+		if (pfFront == 0)
+		{
+			return;
+		}
+		_Characters = new Character[1 << 16];
+		size_t num = fread(_Characters, sizeof(Character), 1 << 16, pfFront);
+		fclose(pfFront);
+
+		/****************************************************************************************************************
+		*
+		*    Brief   : 读取纹理数据
+		*
+		****************************************************************************************************************/
+		//读取文件
+		char texFileName[32] = {};
+		sprintf(texFileName, "%s.FT", pFile);
+		FILE* pfTex = fopen(texFileName, "rb");
+		if (pfTex == 0)
+		{
+			return;
+		}
+		
+		fread(&_TextureW, sizeof(int), 1, pfTex);
+		fread(&_TextureH, sizeof(int), 1, pfTex);
+		char* pBuffer = new char[_TextureW * _TextureH];
+		fread(pBuffer, _TextureW * _TextureH, 1, pfTex);
+		
+		glGenTextures(1, &_Texture);
+		glBindTexture(GL_TEXTURE_2D, _Texture);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, _TextureW, _TextureH, 0, GL_ALPHA, GL_UNSIGNED_BYTE, pBuffer);
+		glBindTexture(GL_TEXTURE_2D, 0);
+		
+		delete[] pBuffer;
+
+		fclose(pfTex);
+
+		/****************************************************************************************************************
+		 *
+		 *    Brief   : 初始化
+		 *
+		 ****************************************************************************************************************/
+		_FrontVertices = new FrontVertex[1 << 16];
 	}
 
 	Character& XFront::GetCharacter(unsigned int cIndex)

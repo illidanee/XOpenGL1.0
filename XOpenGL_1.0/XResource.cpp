@@ -44,4 +44,30 @@ namespace Smile
 
 		return res;
 	}
+
+	/****************************************************************************************************************
+	 *
+	 *    Brief   : 将alpha单通道纹理保存为蓝色通道4通道图片。
+	 *
+	 ****************************************************************************************************************/
+	int XResource::SaveTextureFileOnlyA(const char* pFile, char* pBuffer, int w, int h)
+	{
+		FIBITMAP* dib = FreeImage_Allocate(w, h, 32);
+
+		unsigned char* pPixel = FreeImage_GetBits(dib);
+
+		for (unsigned int i = 0; i < w * h; ++i)
+		{
+			pPixel[i * 4 + 0] = pBuffer[i];
+			pPixel[i * 4 + 1] = 0;
+			pPixel[i * 4 + 2] = 0;
+			pPixel[i * 4 + 3] = 255;
+		}
+
+		BOOL res = FreeImage_Save(FIF_PNG, dib, pFile, PNG_DEFAULT);
+
+		FreeImage_Unload(dib);
+
+		return res;
+	}
 }
