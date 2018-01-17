@@ -29,6 +29,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenGL-QT", "OpenGL-QT\Open
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenGLES2.0-QT", "OpenGLES2.0-QT\OpenGLES2.0-QT.vcxproj", "{3615DBF4-4C15-4185-969E-BCEF2CFA1389}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lua", "Lua\Lua.vcxproj", "{9FC8CD82-10FC-4C44-8BE3-2D4B6115D479}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -137,6 +139,14 @@ Global
 		{3615DBF4-4C15-4185-969E-BCEF2CFA1389}.Release|x64.ActiveCfg = Release|x64
 		{3615DBF4-4C15-4185-969E-BCEF2CFA1389}.Release|x64.Build.0 = Release|x64
 		{3615DBF4-4C15-4185-969E-BCEF2CFA1389}.Release|x86.ActiveCfg = Release|x64
+		{9FC8CD82-10FC-4C44-8BE3-2D4B6115D479}.Debug|x64.ActiveCfg = Debug|x64
+		{9FC8CD82-10FC-4C44-8BE3-2D4B6115D479}.Debug|x64.Build.0 = Debug|x64
+		{9FC8CD82-10FC-4C44-8BE3-2D4B6115D479}.Debug|x86.ActiveCfg = Debug|Win32
+		{9FC8CD82-10FC-4C44-8BE3-2D4B6115D479}.Debug|x86.Build.0 = Debug|Win32
+		{9FC8CD82-10FC-4C44-8BE3-2D4B6115D479}.Release|x64.ActiveCfg = Release|x64
+		{9FC8CD82-10FC-4C44-8BE3-2D4B6115D479}.Release|x64.Build.0 = Release|x64
+		{9FC8CD82-10FC-4C44-8BE3-2D4B6115D479}.Release|x86.ActiveCfg = Release|Win32
+		{9FC8CD82-10FC-4C44-8BE3-2D4B6115D479}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
