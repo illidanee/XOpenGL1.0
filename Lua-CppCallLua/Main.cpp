@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "Lua.hpp"
-
+#include "Dump.h"
 
 int main()
 {
@@ -26,12 +26,12 @@ int main()
 	 *
 	 ****************************************************************************************************************/
 	luaL_dofile(L, "main.lua");
-	lua_getglobal(L, "Add");
-	lua_pushinteger(L, 3);
-	lua_pushinteger(L, 6);
-	lua_call(L, 2, 1);
-	int num = (int)lua_tointeger(L, -1);
-	lua_pop(L, 1);
+	lua_getglobal(L, "Add");				DumpStack(L);
+	lua_pushinteger(L, 3);					DumpStack(L);
+	lua_pushinteger(L, 6);					DumpStack(L);
+	lua_call(L, 2, 1);						DumpStack(L);
+	int num = (int)lua_tointeger(L, -1);	DumpStack(L);
+	lua_pop(L, 1);							DumpStack(L);
 	printf("Result = %d\n", num);
 
 	/****************************************************************************************************************
