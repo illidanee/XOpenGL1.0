@@ -7,9 +7,8 @@
 ****************************************************************************************************************/
 void DumpStack(lua_State* L)
 {
-	
 	int num = lua_gettop(L);
-	printf("元素个数：%d  --------------------------------------------------------------------------------------------\n", num);
+	printf("元素个数：[%05d] <<--------------------------------------------------------------------------------------------\n", num);
 	for (int i = 1; i <= num; ++i)
 	{
 		DumpInfo(L, i);
@@ -44,23 +43,26 @@ void DumpInfo(lua_State* L, int i)
 	break;
 	case LUA_TTABLE:
 	{
+		const void * pAddr = lua_topointer(L, i);
+		printf("[%p]\n", pAddr);
 		DumpTable(L, i);
 	}
 	break;
 	case LUA_TFUNCTION:
 	{
-		const void * pFunc = lua_topointer(L, -1);
-		printf("[%p]\n", pFunc);
+		const void * pAddr = lua_topointer(L, i);
+		printf("[%p]\n", pAddr);
 	}
 	break;
 	case LUA_TUSERDATA:
 	{
-		printf("[******]\n");
+		const void * pAddr = lua_topointer(L, i);
+		printf("[%p]\n", pAddr);
 	}
 	break;
 	default:
 	{
-		printf("Other]\n");
+		printf("[Other]\n");
 	}
 	}
 }
@@ -68,7 +70,7 @@ void DumpInfo(lua_State* L, int i)
 void DumpTable(lua_State* L, int i)
 {
 	lua_pushvalue(L, i);
-	printf("\n{\n");
+	printf("{\n");
 
 	lua_pushnil(L);
 
@@ -81,7 +83,7 @@ void DumpTable(lua_State* L, int i)
 		printf("\n");
 		lua_pop(L, 1);
 	}
-	printf("\n}\n");
+	printf("}\n");
 
 	lua_pop(L, 1);				//注意这个需要弹出一个多余的栈顶元素。
 }
@@ -114,24 +116,25 @@ void DumpTableHeader(lua_State* L, int i)
 	break;
 	case LUA_TTABLE:
 	{
-		const void * pFunc = lua_topointer(L, -1);
-		printf("[%p]", pFunc);
+		const void * pAddr = lua_topointer(L, i);
+		printf("[%p]", pAddr);
 	}
 	break;
 	case LUA_TFUNCTION:
 	{
-		const void * pFunc = lua_topointer(L, -1);
-		printf("[%p]", pFunc);
+		const void * pAddr = lua_topointer(L, i);
+		printf("[%p]", pAddr);
 	}
 	break;
 	case LUA_TUSERDATA:
 	{
-		printf("[******]");
+		const void * pAddr = lua_topointer(L, i);
+		printf("[%p]", pAddr);
 	}
 	break;
 	default:
 	{
-		//printf("[Other]");
+		printf("[Other]");
 	}
 	}
 }
@@ -164,24 +167,25 @@ void DumpTableBody(lua_State* L, int i)
 	break;
 	case LUA_TTABLE:
 	{
-		const void * pFunc = lua_topointer(L, -1);
-		printf("[%p]", pFunc);
+		const void * pAddr = lua_topointer(L, i);
+		printf("[%p]", pAddr);
 	}
 	break;
 	case LUA_TFUNCTION:
 	{
-		const void * pFunc = lua_topointer(L, -1);
-		printf("[%p]", pFunc);
+		const void * pAddr = lua_topointer(L, i);
+		printf("[%p]", pAddr);
 	}
 	break;
 	case LUA_TUSERDATA:
 	{
-		printf("[******]");
+		const void * pAddr = lua_topointer(L, i);
+		printf("[%p]", pAddr);
 	}
 	break;
 	default:
 	{
-		//printf("[Other]");
+		printf("[Other]");
 	}
 	}
 }
