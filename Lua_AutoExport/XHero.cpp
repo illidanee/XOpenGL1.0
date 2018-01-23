@@ -13,9 +13,19 @@ XHero::~XHero()
 
 }
 
+const char* XHero::GetName()
+{
+	return _Name;
+}
+
 void XHero::SetName(const char* name)
 {
 	strcpy(_Name, name);
+}
+
+int XHero::GetAge()
+{
+	return _Age;
 }
 
 void XHero::SetAge(int age)

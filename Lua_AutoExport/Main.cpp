@@ -11,7 +11,9 @@ int main()
 
 	LuaRegister<XHero> reg(L);
 	reg.Begin();
+	reg.Export(&XHero::GetName, "GetName");
 	reg.Export(&XHero::SetName, "SetName");
+	reg.Export(&XHero::GetAge, "GetAge");
 	reg.Export(&XHero::SetAge, "SetAge");
 	reg.End();
 
