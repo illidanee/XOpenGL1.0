@@ -6,18 +6,35 @@
 
 /****************************************************************************************************************
 *
+*    Brief   : 全局函数导入Lua。
+*
+****************************************************************************************************************/
+template <typename FUNCTION>
+void LuaRegisterFunction(lua_State* L, FUNCTION func, const char* pFuncName)
+{
+	int size = sizeof(func);
+	void* pUD = lua_newuserdata(L, size);
+	memcpy(pUD, &func, size);
+
+	lua_pushcclosure(L, LuaFunctionCallProxy<FUNCTION>::CallProxy, 1);
+	lua_setglobal(L, pFuncName);
+}
+
+
+/****************************************************************************************************************
+*
 *    Brief   : Cpp类导入Lua。
 *
 ****************************************************************************************************************/
 template <typename CLASS>
-class LuaRegister
+class LuaRegisterClass
 {
 public:
-	LuaRegister(lua_State* L)
+	LuaRegisterClass(lua_State* L)
 	{
 		_L = L;
 	}
-	~LuaRegister()
+	~LuaRegisterClass()
 	{
 
 	}
@@ -40,7 +57,7 @@ public:
 		lua_rawset(_L, metaTableIndex);
 
 		lua_pushliteral(_L, "__gc");
-		lua_pushcfunction(_L, LuaRegister<CLASS>::Destroy);
+		lua_pushcfunction(_L, LuaRegisterClass<CLASS>::Destroy);
 		lua_rawset(_L, metaTableIndex);
 
 		lua_pop(_L, 1);
@@ -53,7 +70,7 @@ public:
 		void* data = lua_newuserdata(_L, size);
 		memcpy(data, &func, size);
 
-		lua_pushcclosure(_L, LuaCallProxy<CLASS, FUNCTION>::CallProxy, 1);
+		lua_pushcclosure(_L, LuaClassCallProxy<CLASS, FUNCTION>::CallProxy, 1);
 		lua_setfield(_L, -2, pFuncName);
 	}
 
@@ -62,7 +79,7 @@ public:
 		lua_pop(_L, 1);
 
 		const char* pClassName = GetClassName<CLASS>();
-		lua_register(_L, pClassName, LuaRegister<CLASS>::Create);
+		lua_register(_L, pClassName, LuaRegisterClass<CLASS>::Create);
 	}
 
 	static int Create(lua_State* L)
@@ -97,11 +114,28 @@ private:
 
 /****************************************************************************************************************
  *
+ *    Brief   : 全局函数函数代理。
+ *
+ ****************************************************************************************************************/
+template <typename FUNCTION>
+class LuaFunctionCallProxy
+{
+public:
+	static int CallProxy(lua_State* L)
+	{
+		FUNCTION func = *(FUNCTION*)lua_touserdata(L, lua_upvalueindex(1));
+		return LuaFunctionCallDispatcher::Dispatch(L, func);
+	}
+};
+
+
+/****************************************************************************************************************
+ *
  *    Brief   : Cpp类函数代理。
  *
  ****************************************************************************************************************/
 template <typename CLASS, typename FUNCTION>
-class LuaCallProxy
+class LuaClassCallProxy
 {
 public:
 	static int CallProxy(lua_State* L)
@@ -114,7 +148,35 @@ public:
 		CLASS* pObj = *(CLASS**)pUD;
 
 		//提取函数的参数和返回值。
-		return LuaCallDispatcher<CLASS>::Dispatch(L, pObj, func);
+		return LuaClassCallDispatcher<CLASS>::Dispatch(L, pObj, func);
+	}
+};
+
+
+/****************************************************************************************************************
+ *
+ *    Brief   : 全局函数返回值与参数提取。
+ *
+ ****************************************************************************************************************/
+class LuaFunctionCallDispatcher
+{
+public:
+	template <typename RET>
+	static int Dispatch(lua_State* L, RET(* func)())
+	{
+		return LuaFunctionCaller<RET>::Call(L, func);
+	}
+
+	template <typename RET, typename P1>
+	static int Dispatch(lua_State* L, RET(* func)(P1))
+	{
+		return LuaFunctionCaller<RET>::Call(L, func);
+	}
+
+	template <typename RET, typename P1, typename P2>
+	static int Dispatch(lua_State* L, RET(* func)(P1, P2))
+	{
+		return LuaFunctionCaller<RET>::Call(L, func);
 	}
 };
 
@@ -125,7 +187,7 @@ public:
  *
  ****************************************************************************************************************/
 template <typename CLASS>
-class LuaCallDispatcher
+class LuaClassCallDispatcher
 {
 public:
 	template <typename RET>
@@ -144,6 +206,72 @@ public:
 	static int Dispatch(lua_State* L, CLASS* pObj, RET(CLASS::* func)(P1, P2))
 	{
 		return LuaClassCaller<CLASS, RET>::Call(L, pObj, func);
+	}
+};
+
+
+/****************************************************************************************************************
+ *
+ *    Brief   : 全局函数调用。
+ *
+ ****************************************************************************************************************/
+template <typename RET>
+class LuaFunctionCaller
+{
+public:
+	static int Call(lua_State* L, RET(* func)())
+	{
+		RET ret = (*func)();
+		WriteValue(L, ret);
+		return 1;
+	}
+
+	template <typename P1>
+	static int Call(lua_State* L, RET(* func)(P1))
+	{
+		P1 p1 = ReadValue(TypeHelper<P1>(), L, 1);
+		RET ret = (*func)(p1);
+		WriteValue(L, ret);
+		return 1;
+	}
+
+	template <typename P1, typename P2>
+	static int Call(lua_State* L, RET(* func)(P1, P2))
+	{
+		P1 p1 = ReadValue(TypeHelper<P1>(), L, 1);
+		P2 p2 = ReadValue(TypeHelper<P2>(), L, 2);
+		RET ret = (*func)(p1, p2);
+		WriteValue(L, ret);
+		return 1;
+	}
+};
+
+//偏特化处理无返回值
+template <>
+class LuaFunctionCaller<void>
+{
+public:
+	static int Call(lua_State* L, void(*func)())
+	{
+		(*func)();
+		return 0;
+	}
+
+	template <typename P1>
+	static int Call(lua_State* L, void(*func)(P1))
+	{
+		P1 p1 = ReadValue(TypeHelper<P1>(), L, 1);
+		(*func)(p1);
+		return 0;
+	}
+
+	template <typename P1, typename P2>
+	static int Call(lua_State* L, void(*func)(P1, P2))
+	{
+		P1 p1 = ReadValue(TypeHelper<P1>(), L, 1);
+		P2 p2 = ReadValue(TypeHelper<P2>(), L, 2);
+		(*func)(p1, p2);
+		return 0;
 	}
 };
 

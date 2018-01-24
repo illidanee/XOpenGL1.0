@@ -10,6 +10,8 @@ local function main()
 end
 
 
+print("GlobalTest:"..GlobalTest(11));
+
 print("---------------------------------------------------------Start");
 
 main()
