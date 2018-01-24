@@ -4,6 +4,8 @@
 #include "LuaRegister.h"
 #include "XHero.h"
 
+int id = 125;
+
 char buff[128] = { 0 };
 const char* GlobalTest(int i)
 {
@@ -16,6 +18,9 @@ int main()
 {
 	lua_State* L = luaL_newstate();
 	luaL_openlibs(L);
+
+	//导出全局变量
+	LuaRegisterVariable<int>(L, id, "id");
 
 	//导出全局函数
 	LuaRegisterFunction(L, GlobalTest, "GlobalTest");

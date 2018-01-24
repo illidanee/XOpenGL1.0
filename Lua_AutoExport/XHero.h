@@ -12,7 +12,7 @@ public:
 	int GetAge();
 	void SetAge(int age);
 
-private:
+public:
 	int _ID;
 	char _Name[32];
 	int _Age;

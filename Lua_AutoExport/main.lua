@@ -9,7 +9,7 @@ local function main()
 	print("Age: "..a:GetAge());
 end
 
-
+print("GlobalVar:"..id);
 print("GlobalTest:"..GlobalTest(11));
 
 print("---------------------------------------------------------Start");
