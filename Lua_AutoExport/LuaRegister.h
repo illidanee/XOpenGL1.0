@@ -76,8 +76,15 @@ public:
 		lua_pop(_L, 1);
 	}
 
+	template <typename TYPE>
+	void ExportVariable(TYPE var, const char* pVarName)
+	{
+		WriteValue(_L, var);
+		lua_setfield(_L, -2, pVarName);
+	}
+
 	template <typename FUNCTION>
-	void Export(FUNCTION func, const char* pFuncName)
+	void ExportFunction(FUNCTION func, const char* pFuncName)
 	{
 		int size = sizeof(func);
 		void* data = lua_newuserdata(_L, size);

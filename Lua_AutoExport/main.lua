@@ -7,6 +7,8 @@ local function main()
 	
 	print("Name: "..a:GetName());
 	print("Age: "..a:GetAge());
+	
+	print("MemberVar:"..a.id);
 end
 
 print("GlobalVar:"..id);

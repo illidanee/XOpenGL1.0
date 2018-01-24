@@ -28,10 +28,11 @@ int main()
 	//µ¼³öÀà
 	LuaRegisterClass<XHero> reg(L);
 	reg.Begin();
-	reg.Export(&XHero::GetName, "GetName");
-	reg.Export(&XHero::SetName, "SetName");
-	reg.Export(&XHero::GetAge, "GetAge");
-	reg.Export(&XHero::SetAge, "SetAge");
+	reg.ExportVariable(id, "id");
+	reg.ExportFunction(&XHero::GetName, "GetName");
+	reg.ExportFunction(&XHero::SetName, "SetName");
+	reg.ExportFunction(&XHero::GetAge, "GetAge");
+	reg.ExportFunction(&XHero::SetAge, "SetAge");
 	reg.End();
 
 	luaL_dofile(L, "main.lua");
