@@ -47,6 +47,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LuaCLib", "LuaCLib\LuaCLib.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lua_Module", "Lua_Module\Lua_Module.vcxproj", "{1598BBFB-CF6C-4724-8125-888FBA61AFD9}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lua_Coroutine", "Lua_Coroutine\Lua_Coroutine.vcxproj", "{64FA8D52-ED64-481C-B9EF-73EF347780C6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -227,6 +229,14 @@ Global
 		{1598BBFB-CF6C-4724-8125-888FBA61AFD9}.Release|x64.Build.0 = Release|x64
 		{1598BBFB-CF6C-4724-8125-888FBA61AFD9}.Release|x86.ActiveCfg = Release|Win32
 		{1598BBFB-CF6C-4724-8125-888FBA61AFD9}.Release|x86.Build.0 = Release|Win32
+		{64FA8D52-ED64-481C-B9EF-73EF347780C6}.Debug|x64.ActiveCfg = Debug|x64
+		{64FA8D52-ED64-481C-B9EF-73EF347780C6}.Debug|x64.Build.0 = Debug|x64
+		{64FA8D52-ED64-481C-B9EF-73EF347780C6}.Debug|x86.ActiveCfg = Debug|Win32
+		{64FA8D52-ED64-481C-B9EF-73EF347780C6}.Debug|x86.Build.0 = Debug|Win32
+		{64FA8D52-ED64-481C-B9EF-73EF347780C6}.Release|x64.ActiveCfg = Release|x64
+		{64FA8D52-ED64-481C-B9EF-73EF347780C6}.Release|x64.Build.0 = Release|x64
+		{64FA8D52-ED64-481C-B9EF-73EF347780C6}.Release|x86.ActiveCfg = Release|Win32
+		{64FA8D52-ED64-481C-B9EF-73EF347780C6}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
