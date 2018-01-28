@@ -33,6 +33,8 @@ function f1(a, b, c)
 	b = b + 1;
 	c = c + 1;
 	print('------------Step 5', a, b, c);
+	
+	return 100;
 end
 
 --运行协程
@@ -41,7 +43,7 @@ coroutine.resume(co, 0, 100, 1000);
 
 --恢复执行
 function cc()
-	print(coroutine.resume(co, a, b, c));
+	print(coroutine.resume(co));
 end
 
 --查看状态
